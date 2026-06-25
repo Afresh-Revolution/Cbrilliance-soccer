@@ -1,0 +1,131 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, $color-charcoal-black 0%, $color-dark-surface 50%, $color-charcoal-black 100%);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba($color-premium-gold, 0.08), transparent 60%);
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-top: 100px;
+    padding-bottom: $spacing-4xl;
+  }
+
+  &__headline {
+    max-width: 800px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__subheadline {
+    max-width: 600px;
+    font-size: 1.125rem;
+    margin-bottom: $spacing-2xl;
+  }
+
+  &__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    margin-bottom: $spacing-3xl;
+  }
+
+  &__pillars {
+    display: grid;
+    gap: $spacing-lg;
+
+    @include respond-to('md') {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__pillar {
+    @include glass-card;
+    padding: $spacing-xl;
+    border-radius: $radius-lg;
+    text-align: center;
+    transition: all $transition-base;
+
+    &:hover {
+      border-color: rgba($color-premium-gold, 0.4);
+      transform: translateY(-4px);
+    }
+
+    h3 {
+      color: $color-premium-gold;
+      margin-bottom: $spacing-sm;
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+.timeline {
+  position: relative;
+  padding-left: $spacing-2xl;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: $color-border-gray;
+  }
+
+  &__item {
+    position: relative;
+    padding-bottom: $spacing-2xl;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: calc(4px - #{$spacing-2xl});
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: $color-premium-gold;
+      border: 2px solid $color-charcoal-black;
+    }
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: $color-premium-gold;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__title {
+    font-size: 1rem;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: $color-muted-gray;
+  }
+}

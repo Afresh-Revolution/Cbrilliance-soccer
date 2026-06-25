@@ -1,0 +1,66 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+
+@use '../abstracts/mixins' as *;
+
+body {
+  font-family: var(--font-body), $font-primary;
+  background-color: $color-midnight;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba($color-accent-blue, 0.35), transparent),
+    radial-gradient(circle at 20% 80%, rgba($color-premium-gold, 0.06), transparent 40%),
+    radial-gradient(circle at 80% 60%, rgba($color-accent-blue, 0.12), transparent 35%);
+  background-attachment: fixed;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba($color-white, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.mesh-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+
+  &--gold {
+    background: rgba($color-premium-gold, 0.15);
+  }
+
+  &--blue {
+    background: rgba($color-accent-blue, 0.25);
+  }
+}
+
+.shield-bg {
+  position: absolute;
+  width: 55%;
+  height: 85%;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(160deg, rgba($color-accent-blue, 0.35), rgba($color-navy-panel, 0.2));
+  clip-path: polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%, 15% 50%);
+  border-radius: 0 40% 40% 0;
+  opacity: 0.7;
+}
+
+html {
+  @include custom-scrollbar(8px);
+}
+
+::selection {
+  background: rgba($color-premium-gold, 0.35);
+  color: $color-white;
+}

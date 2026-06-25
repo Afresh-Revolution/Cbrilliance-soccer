@@ -1,0 +1,22 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-2xl;
+  padding: $spacing-lg;
+  background: $color-dark-surface;
+  border: 1px solid $color-border-gray;
+  border-radius: $radius-lg;
+
+  &__search {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  &__select {
+    min-width: 150px;
+  }
+}

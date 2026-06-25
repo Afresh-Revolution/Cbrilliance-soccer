@@ -1,0 +1,80 @@
+@use 'colors' as *;
+@use 'variables' as *;
+@use 'breakpoints' as *;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin glass-card {
+  background: rgba($color-dark-surface, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba($color-premium-gold, 0.15);
+}
+
+@mixin gold-gradient-text {
+  background: linear-gradient(135deg, $color-premium-gold, $color-light-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@mixin hover-lift {
+  transition: transform $transition-base, box-shadow $transition-base;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $color-premium-gold;
+    outline-offset: 2px;
+  }
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin custom-scrollbar($width: 6px) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba($color-premium-gold, 0.45) rgba($color-white, 0.04);
+
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba($color-white, 0.04);
+    border-radius: 100px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba($color-premium-gold, 0.55), rgba($color-premium-gold, 0.25));
+    border-radius: 100px;
+    border: 1px solid rgba($color-white, 0.06);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba($color-premium-gold, 0.7);
+  }
+}
+
+@mixin section-padding {
+  padding: $spacing-3xl $spacing-md;
+  @include respond-to('lg') {
+    padding: $spacing-4xl $spacing-xl;
+  }
+}

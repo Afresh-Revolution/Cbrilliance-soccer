@@ -1,0 +1,40 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.service-card {
+  padding: $spacing-2xl;
+  background: $color-dark-surface;
+  border: 1px solid $color-border-gray;
+  border-radius: $radius-lg;
+  @include hover-lift;
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: $spacing-md;
+    border: 1px solid rgba($color-premium-gold, 0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display), $font-display;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: $color-premium-gold;
+  }
+
+  h3 {
+    color: $color-premium-gold;
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.inquiry-form {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: $spacing-2xl;
+  @include glass-card;
+  border-radius: $radius-lg;
+}

@@ -1,0 +1,47 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.pathway-section {
+  margin-bottom: $spacing-3xl;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $color-border-gray;
+
+    h2 {
+      color: $color-premium-gold;
+    }
+
+    span {
+      font-size: 0.85rem;
+      color: $color-muted-gray;
+    }
+  }
+}
+
+.pathway-timeline {
+  position: relative;
+  display: flex;
+  gap: $spacing-md;
+  overflow-x: auto;
+  padding-bottom: $spacing-md;
+
+  &__step {
+    flex-shrink: 0;
+    width: 200px;
+    padding: $spacing-lg;
+    background: $color-dark-surface;
+    border: 1px solid $color-border-gray;
+    border-radius: $radius-lg;
+    text-align: center;
+
+    &--active {
+      border-color: $color-premium-gold;
+    }
+  }
+}

@@ -1,0 +1,111 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
+
+$mobile-nav-top: 76px;
+
+.mobile-nav {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: rgba($color-midnight, 0.72);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity $transition-base, visibility $transition-base;
+    z-index: $z-overlay;
+    cursor: pointer;
+
+    &--visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    @include respond-to('lg') {
+      display: none;
+    }
+  }
+
+  &__panel {
+    position: fixed;
+    top: $mobile-nav-top;
+    right: 0;
+    bottom: 0;
+    width: min(400px, 85vw);
+    max-width: 100%;
+    background: $color-midnight;
+    border-left: 1px solid rgba($color-white, 0.1);
+    box-shadow: -16px 0 48px rgba(0, 0, 0, 0.45);
+    z-index: $z-overlay + 1;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(100%);
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0.35s ease;
+
+    @include respond-to('lg') {
+      display: none;
+    }
+
+    &--open {
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  &__inner {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: $spacing-xl $spacing-lg $spacing-3xl;
+    display: flex;
+    flex-direction: column;
+    @include custom-scrollbar(5px);
+
+    @include respond-to('sm') {
+      padding: $spacing-2xl $spacing-xl $spacing-3xl;
+    }
+  }
+
+  &__link {
+    display: block;
+    width: 100%;
+    padding: $spacing-md 0;
+    font-family: var(--font-display), $font-display;
+    font-size: clamp(1.05rem, 4.5vw, 1.35rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.25;
+    color: rgba($color-white, 0.92);
+    border-bottom: 1px solid rgba($color-white, 0.08);
+    transition: color $transition-fast, padding-left $transition-fast;
+
+    &:hover {
+      color: $color-white;
+      padding-left: $spacing-xs;
+    }
+
+    &--active {
+      color: $color-premium-gold;
+      padding-left: $spacing-sm;
+      border-bottom-color: rgba($color-premium-gold, 0.25);
+    }
+  }
+
+  &__cta {
+    margin-top: $spacing-xl;
+    flex-shrink: 0;
+  }
+}

@@ -1,0 +1,122 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: 100px;
+  transition: all $transition-base;
+  @include focus-ring;
+
+  &--primary {
+    background: $color-white;
+    color: $color-midnight;
+
+    &:hover {
+      background: $color-premium-gold;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba($color-premium-gold, 0.25);
+    }
+  }
+
+  &--outline {
+    border: 1px solid rgba($color-white, 0.25);
+    color: $color-white;
+    background: transparent;
+
+    &:hover {
+      border-color: $color-premium-gold;
+      color: $color-premium-gold;
+      background: rgba($color-premium-gold, 0.08);
+    }
+  }
+
+  &--ghost {
+    color: rgba($color-white, 0.7);
+    background: rgba($color-white, 0.06);
+    backdrop-filter: blur(8px);
+
+    &:hover {
+      background: rgba($color-white, 0.12);
+      color: $color-white;
+    }
+  }
+
+  &--gold {
+    background: linear-gradient(135deg, $color-premium-gold, $color-light-gold);
+    color: $color-midnight;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba($color-premium-gold, 0.35);
+    }
+  }
+
+  &--sm {
+    padding: 0.45rem 1rem;
+    font-size: 0.65rem;
+  }
+
+  &--lg {
+    padding: 0.9rem 2rem;
+    font-size: 0.75rem;
+  }
+
+  &--full {
+    width: 100%;
+  }
+}
+
+.pill-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+
+  &__tab {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 100px;
+    border: 1px solid rgba($color-white, 0.12);
+    color: rgba($color-white, 0.5);
+    background: transparent;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      color: $color-white;
+      border-color: rgba($color-white, 0.3);
+    }
+
+    &--active {
+      background: $color-white;
+      color: $color-midnight;
+      border-color: $color-white;
+    }
+  }
+}
+
+.position-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 100px;
+  background: rgba($color-accent-blue, 0.5);
+  color: $color-white;
+  border: 1px solid rgba($color-white, 0.15);
+}

@@ -1,0 +1,274 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
+
+// ─── Squad cover-flow (Chelsea-style) ─────────────────────────────
+.squad-coverflow {
+  position: relative;
+  padding: 96px 0 $spacing-4xl;
+  overflow: hidden;
+  min-height: 88vh;
+
+  &__header {
+    max-width: $container-wide;
+    margin: 0 auto $spacing-2xl;
+    padding: 0 $spacing-lg;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-lg;
+  }
+
+  &__tabs {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &__tab {
+    padding: 0.5rem 1.35rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 100px;
+    border: 1px solid rgba($color-white, 0.12);
+    color: rgba($color-white, 0.5);
+    transition: all $transition-fast;
+
+    &--active {
+      background: $color-white;
+      color: $color-midnight;
+      border-color: $color-white;
+    }
+
+    &:not(&--active):hover {
+      color: $color-white;
+      border-color: rgba($color-white, 0.3);
+    }
+  }
+
+  &__arena {
+    position: relative;
+    max-width: $container-wide;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+    min-height: clamp(480px, 70vh, 640px);
+  }
+
+  &--detail {
+    .squad-coverflow__header {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+  }
+
+  &__vertical-label {
+    position: absolute;
+    right: $spacing-lg;
+    top: 42%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba($color-white, 0.18);
+    z-index: 5;
+    display: none;
+
+    @include respond-to('lg') {
+      display: block;
+    }
+  }
+
+  &__track {
+    position: relative;
+    height: clamp(420px, 62vh, 560px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    perspective: 1400px;
+    overflow: hidden;
+
+    @media (max-width: 767px) {
+      height: 400px;
+    }
+  }
+
+  &__card {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: -110px;
+    width: 220px;
+    cursor: pointer;
+    transform-origin: center bottom;
+    will-change: transform, opacity;
+
+    @include respond-to('md') {
+      margin-left: -120px;
+      width: 240px;
+    }
+
+    &--center {
+      width: 260px;
+      margin-left: -130px;
+
+      @include respond-to('md') {
+        width: 280px;
+        margin-left: -140px;
+      }
+    }
+  }
+
+  &__shield {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    background: linear-gradient(
+      180deg,
+      rgba($color-accent-blue, 0.45) 0%,
+      rgba($color-navy-panel, 0.25) 55%,
+      rgba($color-midnight, 0.15) 100%
+    );
+    clip-path: polygon(
+      50% 0%,
+      92% 8%,
+      100% 28%,
+      100% 72%,
+      72% 100%,
+      50% 96%,
+      28% 100%,
+      0% 72%,
+      0% 28%,
+      8% 8%
+    );
+    overflow: hidden;
+    border: 1px solid rgba($color-white, 0.08);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+
+    .squad-coverflow__card--center & {
+      height: 420px;
+      background: linear-gradient(
+        180deg,
+        rgba($color-accent-blue, 0.55) 0%,
+        rgba($color-navy-elevated, 0.35) 50%,
+        rgba($color-midnight, 0.2) 100%
+      );
+      box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.55),
+        0 0 80px rgba($color-accent-blue, 0.15);
+    }
+
+    &--clickable {
+      cursor: pointer;
+    }
+  }
+
+  &__img {
+    object-fit: contain;
+    object-position: bottom center;
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
+  }
+
+  &__number {
+    position: absolute;
+    top: 18%;
+    right: 18%;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba($color-accent-blue, 0.85);
+    border: 2px solid rgba($color-white, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display), $font-display;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: $color-white;
+    z-index: 2;
+  }
+
+  &__name {
+    text-align: center;
+    margin-top: $spacing-md;
+    text-decoration: none;
+    color: inherit;
+
+    &--center {
+      display: block;
+      padding-bottom: $spacing-sm;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      font: inherit;
+      text-align: center;
+    }
+
+    &--side {
+      span {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: rgba($color-white, 0.7);
+        @include truncate;
+      }
+
+      small {
+        font-size: 0.65rem;
+        color: $color-muted-gray;
+      }
+    }
+  }
+
+  &__name-first {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba($color-white, 0.75);
+    margin-bottom: 2px;
+  }
+
+  &__name-last {
+    display: block;
+    font-family: var(--font-display), $font-display;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: $color-white;
+    line-height: 1;
+  }
+
+  &__nav {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-xl;
+    margin-top: $spacing-xl;
+
+    button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba($color-white, 0.15);
+      background: rgba($color-navy-panel, 0.5);
+      color: $color-white;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: $color-white;
+        color: $color-midnight;
+      }
+    }
+  }
+}

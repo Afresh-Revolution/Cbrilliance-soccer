@@ -1,0 +1,205 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
+
+.player-profile-v2 {
+  min-height: 100vh;
+  padding-top: 76px;
+  position: relative;
+  overflow: hidden;
+
+  &__grid {
+    display: grid;
+    grid-template-areas:
+      'header'
+      'meta'
+      'hero'
+      'panels'
+      'gauges'
+      'cta';
+    gap: $spacing-md;
+    padding: $spacing-2xl $spacing-lg $spacing-3xl;
+    min-height: calc(100vh - 76px);
+
+    @include respond-to('lg') {
+      grid-template-columns: minmax(0, 640px) 1fr;
+      grid-template-rows: auto auto auto auto auto;
+      grid-template-areas:
+        'header hero'
+        'meta hero'
+        'panels .'
+        'gauges .'
+        'cta .';
+      gap: $spacing-2xl;
+      padding: $spacing-4xl $spacing-2xl $spacing-4xl $spacing-3xl;
+      align-items: start;
+    }
+  }
+
+  &__header {
+    grid-area: header;
+    margin-bottom: 0;
+  }
+
+  &__meta-row {
+    grid-area: meta;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+
+  &__hero {
+    grid-area: hero;
+    position: relative;
+    min-height: 320px;
+    margin-inline: -$spacing-lg;
+
+    @include respond-to('lg') {
+      min-height: clamp(360px, 42vh, 520px);
+      margin-inline: 0;
+      align-self: stretch;
+      overflow: visible;
+    }
+  }
+
+  &__shield {
+    position: absolute;
+    width: 80%;
+    height: 85%;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(160deg, rgba($color-accent-blue, 0.35), rgba($color-navy-panel, 0.2));
+    clip-path: polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%, 15% 50%);
+    border-radius: 0 40% 40% 0;
+    opacity: 0.7;
+
+    @include respond-to('lg') {
+      width: 72%;
+      height: 90%;
+      right: 0;
+      top: auto;
+      bottom: 0;
+      transform: none;
+    }
+  }
+
+  &__photo-wrap {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 320px;
+    z-index: 2;
+
+    @include respond-to('lg') {
+      position: absolute;
+      inset: 0;
+      min-height: auto;
+    }
+
+    img {
+      max-height: 100%;
+      width: auto;
+      max-width: 92%;
+      object-fit: contain;
+      object-position: bottom center;
+      filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.5));
+
+      @include respond-to('lg') {
+        max-height: 100%;
+        max-width: 85%;
+      }
+    }
+  }
+
+  &__jersey {
+    position: absolute;
+    right: 15%;
+    top: 20%;
+    z-index: 1;
+    pointer-events: none;
+
+    @include respond-to('lg') {
+      right: 8%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+
+  &__panels {
+    grid-area: panels;
+    display: grid;
+    gap: $spacing-lg;
+  }
+
+  &__panel {
+    background: $color-glass;
+    backdrop-filter: blur(16px) saturate(1.3);
+    border: 1px solid $color-border-gray;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+  }
+
+  &__stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+  }
+
+  &__gauges {
+    grid-area: gauges;
+    display: flex;
+    gap: $spacing-xl;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  &__cta-row {
+    grid-area: cta;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
+  &__bio-section {
+    padding: $spacing-4xl $spacing-lg;
+    max-width: 900px;
+    margin: 0 auto;
+
+    @include respond-to('lg') {
+      padding: $spacing-4xl $spacing-3xl;
+    }
+  }
+
+  &__timeline {
+    padding: $spacing-3xl $spacing-lg $spacing-4xl;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+.match-mini {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: rgba($color-navy-elevated, 0.5);
+  border-radius: $radius-md;
+  margin-top: $spacing-sm;
+  font-size: 0.8rem;
+
+  &__date {
+    color: $color-muted-gray;
+    font-size: 0.7rem;
+    min-width: 70px;
+  }
+
+  &__teams {
+    flex: 1;
+    font-weight: 600;
+  }
+}

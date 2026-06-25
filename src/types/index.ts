@@ -1,0 +1,238 @@
+export type PlayerStatus =
+  | 'available_for_trials'
+  | 'on_trial'
+  | 'abroad'
+  | 'in_development'
+  | 'professional_squad'
+  | 'in_camp';
+
+export type PlayerPosition =
+  | 'goalkeeper'
+  | 'defender'
+  | 'midfielder'
+  | 'forward';
+
+export type PreferredFoot = 'left' | 'right' | 'both';
+
+export type InquiryStatus = 'new' | 'pending' | 'contacted' | 'closed';
+
+export type UserRole = 'super_admin' | 'content_admin' | 'academy_staff';
+
+export type NewsCategory =
+  | 'academy_news'
+  | 'player_updates'
+  | 'trial_news'
+  | 'club_news'
+  | 'international_opportunities'
+  | 'agency_announcements';
+
+export type AgeCategory = 'U10' | 'U13' | 'U15' | 'U17' | 'U19' | 'Senior';
+
+export interface PlayerStrengths {
+  pace: number;
+  vision: number;
+  passing: number;
+  dribbling: number;
+  finishing: number;
+  tackling: number;
+  leadership: number;
+  strength: number;
+}
+
+export interface PlayerStatistics {
+  matchesPlayed: number;
+  goals: number;
+  assists: number;
+  cleanSheets: number;
+  minutesPlayed: number;
+}
+
+export interface PlayerAchievement {
+  id: string;
+  title: string;
+  description?: string;
+  date: string;
+  type: 'award' | 'tournament' | 'recognition' | 'milestone';
+}
+
+export interface PreviousClub {
+  id: string;
+  name: string;
+  period: string;
+  role?: string;
+}
+
+export interface MovementRecord {
+  id: string;
+  type:
+    | 'academy_entry'
+    | 'camp_participation'
+    | 'agency_representation'
+    | 'trial'
+    | 'professional_team'
+    | 'international_opportunity';
+  title: string;
+  description?: string;
+  date: string;
+  location?: string;
+}
+
+export interface Player {
+  id: string;
+  fullName: string;
+  slug: string;
+  profilePhoto: string;
+  dateOfBirth: string;
+  age: number;
+  nationality: string;
+  position: PlayerPosition;
+  height: string;
+  weight: string;
+  preferredFoot: PreferredFoot;
+  biography: string;
+  strengths: PlayerStrengths;
+  statistics: PlayerStatistics;
+  achievements: PlayerAchievement[];
+  previousClubs: PreviousClub[];
+  videos: string[];
+  images: string[];
+  movementHistory: MovementRecord[];
+  status: PlayerStatus;
+  academyGraduate: boolean;
+  professionalPlayer: boolean;
+  jerseyNumber?: number;
+  featured?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AcademyApplication {
+  id: string;
+  fullName: string;
+  dateOfBirth: string;
+  position: PlayerPosition;
+  height: string;
+  preferredFoot: PreferredFoot;
+  parentGuardianName: string;
+  email: string;
+  phone: string;
+  previousClub?: string;
+  status: InquiryStatus;
+  createdAt: string;
+}
+
+export interface ScoutInquiry {
+  id: string;
+  scoutName: string;
+  clubName: string;
+  email: string;
+  phone: string;
+  message: string;
+  playerId?: string;
+  status: InquiryStatus;
+  createdAt: string;
+}
+
+export interface ContactInquiry {
+  id: string;
+  fullName: string;
+  organization?: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: InquiryStatus;
+  createdAt: string;
+}
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: NewsCategory;
+  coverImage: string;
+  author: string;
+  published: boolean;
+  featured?: boolean;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Video {
+  id: string;
+  title: string;
+  thumbnail: string;
+  videoUrl: string;
+  playerId?: string;
+  playerName?: string;
+  position?: PlayerPosition;
+  ageCategory?: AgeCategory;
+  duration: string;
+  featured?: boolean;
+  createdAt: string;
+}
+
+export interface ClubStaff {
+  id: string;
+  name: string;
+  role: string;
+  photo?: string;
+  bio?: string;
+}
+
+export interface Fixture {
+  id: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore?: number;
+  awayScore?: number;
+  date: string;
+  venue: string;
+  competition: string;
+  isUpcoming: boolean;
+}
+
+export interface ActivityItem {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  date: string;
+  playerId?: string;
+}
+
+export interface GalleryItem {
+  id: string;
+  title: string;
+  imageUrl: string;
+  category: string;
+}
+
+export interface SiteStats {
+  registeredPlayers: number;
+  academyGraduates: number;
+  playersAbroad: number;
+  playersOnTrial: number;
+  scoutRequests: number;
+  clubMatchesPlayed: number;
+  professionalPlacements: number;
+}
+
+export interface ClubStats {
+  matchesPlayed: number;
+  wins: number;
+  goalsScored: number;
+  cleanSheets: number;
+  playersDeveloped: number;
+  leaguePosition: number;
+}
+
+export interface Profile {
+  id: string;
+  email: string;
+  fullName: string;
+  role: UserRole;
+  createdAt: string;
+}

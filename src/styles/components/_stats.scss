@@ -1,0 +1,50 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.stat-card {
+  text-align: center;
+  padding: $spacing-2xl $spacing-lg;
+  background: $color-dark-surface;
+  border: 1px solid $color-border-gray;
+  border-radius: $radius-lg;
+  @include hover-lift;
+
+  &__value {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    @include gold-gradient-text;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__label {
+    font-size: 0.85rem;
+    color: $color-muted-gray;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.skill-bar {
+  margin-bottom: $spacing-md;
+
+  &__header {
+    @include flex-between;
+    margin-bottom: $spacing-xs;
+    font-size: 0.875rem;
+  }
+
+  &__track {
+    height: 6px;
+    background: $color-border-gray;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, $color-premium-gold, $color-light-gold);
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+}

@@ -1,0 +1,34 @@
+// CBFC — Immersive palette
+$color-midnight: #03081a;
+$color-deep-navy: #0a1428;
+$color-navy-panel: #0f1c37;
+$color-navy-elevated: #152240;
+$color-premium-gold: #C8A75D;
+$color-charcoal-black: #03081a;
+$color-dark-surface: #0f1c37;
+$color-white: #FFFFFF;
+$color-soft-light: #e8ecf4;
+$color-light-gold: #E2C68B;
+$color-muted-gray: #7a8ba8;
+$color-border-gray: rgba(255, 255, 255, 0.08);
+$color-glass: rgba(15, 28, 55, 0.55);
+$color-success: #2E8B57;
+$color-danger: #C0392B;
+$color-accent-blue: #3d5a9e;
+
+:root {
+  --color-midnight: #{$color-midnight};
+  --color-deep-navy: #{$color-deep-navy};
+  --color-navy-panel: #{$color-navy-panel};
+  --color-premium-gold: #{$color-premium-gold};
+  --color-charcoal-black: #{$color-charcoal-black};
+  --color-dark-surface: #{$color-dark-surface};
+  --color-white: #{$color-white};
+  --color-soft-light: #{$color-soft-light};
+  --color-light-gold: #{$color-light-gold};
+  --color-muted-gray: #{$color-muted-gray};
+  --color-border-gray: #{$color-border-gray};
+  --color-glass: #{$color-glass};
+  --color-success: #{$color-success};
+  --color-danger: #{$color-danger};
+}

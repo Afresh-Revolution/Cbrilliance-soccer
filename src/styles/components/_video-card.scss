@@ -1,0 +1,66 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.video-card {
+  position: relative;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: $color-dark-surface;
+  border: 1px solid $color-border-gray;
+  @include hover-lift;
+
+  &__thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__play {
+    position: absolute;
+    inset: 0;
+    @include flex-center;
+    background: rgba(0, 0, 0, 0.3);
+
+    span {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba($color-premium-gold, 0.9);
+      @include flex-center;
+      color: $color-charcoal-black;
+      font-size: 1.25rem;
+    }
+  }
+
+  &__duration {
+    position: absolute;
+    bottom: $spacing-sm;
+    right: $spacing-sm;
+    padding: 0.2rem 0.5rem;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: $radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  &__info {
+    padding: $spacing-md;
+  }
+
+  &__title {
+    font-size: 0.95rem;
+    margin-bottom: $spacing-xs;
+    color: $color-white;
+  }
+
+  &__meta {
+    font-size: 0.8rem;
+    color: $color-muted-gray;
+  }
+}

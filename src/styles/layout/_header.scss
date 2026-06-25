@@ -1,0 +1,203 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-header;
+  transition: all $transition-base;
+
+  &--scrolled {
+    background: rgba($color-midnight, 0.85);
+    backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid $color-border-gray;
+  }
+
+  &--transparent {
+    background: transparent;
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 3;
+    @include flex-between;
+    height: 76px;
+    max-width: $container-wide;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+
+    @include respond-to('lg') {
+      padding: 0 $spacing-2xl;
+    }
+  }
+
+  &__logo {
+    font-family: var(--font-display), $font-display;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    @include gold-gradient-text;
+  }
+
+  &__nav {
+    display: none;
+
+    @include respond-to('lg') {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xl;
+    }
+  }
+
+  &__link {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba($color-white, 0.55);
+    transition: color $transition-fast;
+    position: relative;
+
+    &:hover,
+    &--active {
+      color: $color-white;
+    }
+
+    &--active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $color-premium-gold;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-shrink: 0;
+    height: 100%;
+  }
+
+  &__cta {
+    @media (max-width: 380px) {
+      display: none;
+    }
+  }
+}
+
+.menu-ball-toggle {
+  display: none;
+  position: relative;
+  z-index: 4;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba($color-white, 0.12);
+  background: rgba($color-navy-panel, 0.55);
+  cursor: pointer;
+  transition: border-color $transition-fast, background $transition-fast, box-shadow $transition-fast;
+
+  @media (max-width: 1023px) {
+    display: inline-flex;
+  }
+
+  &:hover {
+    border-color: rgba($color-premium-gold, 0.45);
+    background: rgba($color-navy-elevated, 0.75);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-premium-gold;
+    outline-offset: 2px;
+  }
+
+  &__ring {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    border: 1px dashed rgba($color-premium-gold, 0.35);
+    animation: menu-ball-orbit 12s linear infinite;
+    pointer-events: none;
+  }
+
+  &__ball {
+    display: flex;
+    width: 30px;
+    height: 30px;
+    animation: menu-ball-spin 6s linear infinite;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+    }
+  }
+
+  &--open {
+    border-color: rgba($color-premium-gold, 0.5);
+    background: rgba($color-navy-elevated, 0.9);
+    box-shadow: 0 0 0 3px rgba($color-premium-gold, 0.12);
+
+    .menu-ball-toggle__ring {
+      animation-duration: 2s;
+      border-style: solid;
+      border-color: rgba($color-premium-gold, 0.55);
+    }
+
+    .menu-ball-toggle__ball {
+      animation: menu-ball-spin-fast 0.7s ease-out forwards, menu-ball-kick 0.45s ease-in-out;
+    }
+  }
+}
+
+@keyframes menu-ball-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes menu-ball-spin-fast {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(180deg) scale(1.08);
+  }
+}
+
+@keyframes menu-ball-kick {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 -3px;
+  }
+}
+
+@keyframes menu-ball-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+

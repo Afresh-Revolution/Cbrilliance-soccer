@@ -1,0 +1,110 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
+
+.footer {
+  background: rgba($color-midnight, 0.9);
+  border-top: 1px solid $color-border-gray;
+  padding: $spacing-4xl $spacing-lg $spacing-2xl;
+  backdrop-filter: blur(12px);
+
+  &__grid {
+    display: grid;
+    gap: $spacing-2xl;
+
+    @include respond-to('md') {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @include respond-to('lg') {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+  }
+
+  &__brand {
+    h3 {
+      font-family: var(--font-display), $font-display;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      margin-bottom: $spacing-md;
+      @include gold-gradient-text;
+    }
+
+    p {
+      max-width: 320px;
+      font-size: 0.9rem;
+    }
+  }
+
+  &__column {
+    h4 {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: $color-muted-gray;
+      margin-bottom: $spacing-lg;
+    }
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+
+    a {
+      font-size: 0.85rem;
+      color: rgba($color-white, 0.6);
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $color-white;
+      }
+    }
+  }
+
+  &__bottom {
+    margin-top: $spacing-3xl;
+    padding-top: $spacing-xl;
+    border-top: 1px solid $color-border-gray;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    align-items: center;
+    text-align: center;
+
+    @include respond-to('md') {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    p {
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  &__social {
+    display: flex;
+    gap: $spacing-sm;
+
+    a {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid $color-border-gray;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: $color-muted-gray;
+      transition: all $transition-fast;
+
+      &:hover {
+        border-color: $color-premium-gold;
+        color: $color-premium-gold;
+        background: rgba($color-premium-gold, 0.1);
+      }
+    }
+  }
+}
