@@ -1,77 +1,227 @@
 @use '../abstracts/colors' as *;
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
+@use '../abstracts/breakpoints' as *;
 
 .admin {
-  display: flex;
   min-height: 100vh;
 
+  @media (max-width: 1023px) {
+    display: block;
+  }
+
+  @include respond-to('lg') {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
   &__sidebar {
-    width: 260px;
+    width: 100%;
+    flex-shrink: 0;
     background: $color-dark-surface;
-    border-right: 1px solid $color-border-gray;
-    padding: $spacing-xl;
+    border-bottom: 1px solid $color-border-gray;
+    padding: $spacing-md $spacing-lg $spacing-sm;
+
+    @media (max-width: 1023px) {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    @include respond-to('lg') {
+      display: flex;
+      flex-direction: column;
+      width: 260px;
+      min-height: 100vh;
+      border-bottom: none;
+      border-right: 1px solid $color-border-gray;
+      padding: $spacing-xl;
+    }
+  }
+
+  &__sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    margin-bottom: $spacing-sm;
+
+    @include respond-to('lg') {
+      display: block;
+      margin-bottom: 0;
+    }
+  }
+
+  &__sidebar-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
     flex-shrink: 0;
 
-    @media (max-width: 768px) {
+    &--mobile {
+      @include respond-to('lg') {
+        display: none;
+      }
+    }
+
+    &--desktop {
       display: none;
+
+      @include respond-to('lg') {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: $spacing-xs;
+        margin-top: auto;
+        padding-top: $spacing-lg;
+      }
     }
   }
 
   &__logo {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     font-weight: 800;
-    margin-bottom: $spacing-2xl;
     color: $color-premium-gold;
+    white-space: nowrap;
+
+    @include respond-to('lg') {
+      font-size: 1.25rem;
+      margin-bottom: $spacing-2xl;
+    }
   }
 
   &__nav {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: $spacing-xs;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: $spacing-xs 0 $spacing-sm;
+    -webkit-overflow-scrolling: touch;
+    @include custom-scrollbar(4px);
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    @include respond-to('lg') {
+      flex: 1;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: visible;
+      padding: 0;
+      margin: $spacing-lg 0;
+    }
   }
 
   &__nav-link {
-    padding: 0.75rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 0.9rem;
     border-radius: $radius-sm;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    font-weight: 500;
     color: $color-muted-gray;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
     transition: all $transition-fast;
+
+    @include respond-to('lg') {
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      width: 100%;
+    }
 
     &:hover,
     &--active {
       background: rgba($color-premium-gold, 0.1);
       color: $color-premium-gold;
     }
+
+    &--compact {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   }
 
   &__main {
-    flex: 1;
-    padding: $spacing-2xl;
+    min-width: 0;
+    padding: $spacing-lg;
     background: $color-charcoal-black;
+
+    @media (max-width: 1023px) {
+      overflow: visible;
+    }
+
+    @include respond-to('sm') {
+      padding: $spacing-xl;
+    }
+
+    @include respond-to('lg') {
+      flex: 1;
+      min-height: 0;
+      padding: $spacing-2xl;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      @include custom-scrollbar;
+    }
+  }
+
+  &__table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: $spacing-lg;
+    @include custom-scrollbar(4px);
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
   }
 
   &__header {
-    margin-bottom: $spacing-2xl;
+    margin-bottom: $spacing-xl;
+
+    @include respond-to('lg') {
+      margin-bottom: $spacing-2xl;
+    }
 
     h1 {
-      font-size: 1.75rem;
+      font-size: clamp(1.35rem, 4vw, 1.75rem);
     }
   }
 
   &__table {
     width: 100%;
+    min-width: 560px;
     border-collapse: collapse;
     background: $color-dark-surface;
     border: 1px solid $color-border-gray;
     border-radius: $radius-lg;
     overflow: hidden;
 
-    th, td {
-      padding: $spacing-md $spacing-lg;
+    th,
+    td {
+      padding: $spacing-sm $spacing-md;
       text-align: left;
       border-bottom: 1px solid $color-border-gray;
-      font-size: 0.875rem;
+      font-size: 0.8rem;
+
+      @include respond-to('lg') {
+        padding: $spacing-md $spacing-lg;
+        font-size: 0.875rem;
+      }
     }
 
     th {
@@ -79,8 +229,13 @@
       color: $color-premium-gold;
       font-weight: 600;
       text-transform: uppercase;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       letter-spacing: 0.05em;
+      white-space: nowrap;
+
+      @include respond-to('lg') {
+        font-size: 0.75rem;
+      }
     }
 
     tr:last-child td {
@@ -90,25 +245,42 @@
 
   &__stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: $spacing-lg;
-    margin-bottom: $spacing-2xl;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+
+    @include respond-to('sm') {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: $spacing-lg;
+    }
+
+    @include respond-to('lg') {
+      margin-bottom: $spacing-2xl;
+    }
   }
 
   &__stat-card {
-    padding: $spacing-xl;
+    padding: $spacing-lg;
     background: $color-dark-surface;
     border: 1px solid $color-border-gray;
     border-radius: $radius-lg;
 
+    @include respond-to('lg') {
+      padding: $spacing-xl;
+    }
+
     h3 {
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 5vw, 2rem);
       color: $color-premium-gold;
       margin-bottom: $spacing-xs;
     }
 
     p {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+
+      @include respond-to('lg') {
+        font-size: 0.85rem;
+      }
     }
   }
 }

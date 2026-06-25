@@ -9,6 +9,7 @@ export default async function AdminVideosPage() {
         <h1>Video Management</h1>
       </div>
 
+      <div className="admin__table-wrap">
       <table className="admin__table">
         <thead>
           <tr>
@@ -29,6 +30,7 @@ export default async function AdminVideosPage() {
           ))}
         </tbody>
       </table>
+      </div>
     </>
   );
 }

@@ -12,6 +12,7 @@ export default async function AdminPlayersPage() {
         <Link href="/admin/players/new" className="btn btn--primary btn--sm">Add Player</Link>
       </div>
 
+      <div className="admin__table-wrap">
       <table className="admin__table">
         <thead>
           <tr>
@@ -38,6 +39,7 @@ export default async function AdminPlayersPage() {
           ))}
         </tbody>
       </table>
+      </div>
     </>
   );
 }

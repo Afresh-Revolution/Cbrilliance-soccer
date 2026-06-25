@@ -12,6 +12,7 @@ export default async function AdminNewsPage() {
         <Link href="/admin/news/new" className="btn btn--primary btn--sm">New Article</Link>
       </div>
 
+      <div className="admin__table-wrap">
       <table className="admin__table">
         <thead>
           <tr>
@@ -36,6 +37,7 @@ export default async function AdminNewsPage() {
           ))}
         </tbody>
       </table>
+      </div>
     </>
   );
 }

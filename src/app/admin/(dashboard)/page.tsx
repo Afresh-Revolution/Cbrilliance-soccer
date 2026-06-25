@@ -31,7 +31,8 @@ export default async function AdminDashboard() {
       </div>
 
       <h2 className="mb-md">Recent Players</h2>
-      <table className="admin__table">
+      <div className="admin__table-wrap">
+        <table className="admin__table">
         <thead>
           <tr>
             <th>Name</th>
@@ -51,6 +52,7 @@ export default async function AdminDashboard() {
           ))}
         </tbody>
       </table>
+      </div>
     </>
   );
 }

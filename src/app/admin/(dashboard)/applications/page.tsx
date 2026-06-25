@@ -6,6 +6,7 @@ export default function AdminApplicationsPage() {
         <p className="text-muted">Review and manage academy registration submissions</p>
       </div>
 
+      <div className="admin__table-wrap">
       <table className="admin__table">
         <thead>
           <tr>
@@ -24,6 +25,7 @@ export default function AdminApplicationsPage() {
           </tr>
         </tbody>
       </table>
+      </div>
     </>
   );
 }

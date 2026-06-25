@@ -21,6 +21,7 @@ export default function AdminInquiriesPage() {
         </div>
       </div>
 
+      <div className="admin__table-wrap">
       <table className="admin__table">
         <thead>
           <tr>
@@ -39,6 +40,7 @@ export default function AdminInquiriesPage() {
           </tr>
         </tbody>
       </table>
+      </div>
     </>
   );
 }
