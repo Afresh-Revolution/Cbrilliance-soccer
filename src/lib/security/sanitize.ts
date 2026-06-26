@@ -46,4 +46,26 @@ export function isAllowedUpload(filename: string, contentType: string): boolean 
   return ALLOWED_EXTENSIONS.has(ext) && ALLOWED_MIME_TYPES.has(contentType.toLowerCase());
 }
 
+/** Magic-byte sniffing for common image types (client-side pre-upload check). */
+const MAGIC_SIGNATURES: { mime: string; bytes: number[] }[] = [
+  { mime: 'image/jpeg', bytes: [0xff, 0xd8, 0xff] },
+  { mime: 'image/png', bytes: [0x89, 0x50, 0x4e, 0x47] },
+  { mime: 'image/gif', bytes: [0x47, 0x49, 0x46] },
+  { mime: 'image/webp', bytes: [0x52, 0x49, 0x46, 0x46] },
+];
+
+export function detectImageMimeFromBytes(buffer: ArrayBuffer): string | null {
+  const bytes = new Uint8Array(buffer.slice(0, 12));
+  for (const sig of MAGIC_SIGNATURES) {
+    if (sig.bytes.every((byte, i) => bytes[i] === byte)) {
+      if (sig.mime === 'image/webp') {
+        const webp = String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]);
+        return webp === 'WEBP' ? 'image/webp' : null;
+      }
+      return sig.mime;
+    }
+  }
+  return null;
+}
+
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

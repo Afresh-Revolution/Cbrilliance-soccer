@@ -4,9 +4,10 @@ import { isSupabaseServiceConfigured } from '@/lib/db/env';
 import { guardPublicPost } from '@/lib/security/api-guard';
 import { sanitizeText } from '@/lib/security/sanitize';
 import { writeAuditLog } from '@/lib/security/audit';
+import { notifyAcademyApplication } from '@/lib/email/notifications';
 
 export async function POST(request: NextRequest) {
-  const blocked = guardPublicPost(request, 'academy-form', 6, 60 * 60 * 1000);
+  const blocked = await guardPublicPost(request, 'academy-form', 6, 60 * 60 * 1000);
   if (blocked) return blocked;
 
   try {
@@ -40,6 +41,16 @@ export async function POST(request: NextRequest) {
       resource: 'academy_applications',
       request,
       metadata: { email: data.email },
+    });
+
+    notifyAcademyApplication({
+      fullName: data.fullName,
+      email: data.email.toLowerCase().trim(),
+      dateOfBirth: data.dateOfBirth,
+      position: data.position,
+      parentGuardianName: data.parentGuardianName,
+      phone: data.phone,
+      previousClub: data.previousClub,
     });
 
     return NextResponse.json({ success: true });

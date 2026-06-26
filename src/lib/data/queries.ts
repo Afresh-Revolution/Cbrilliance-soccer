@@ -1,4 +1,4 @@
-import type { Player, NewsArticle, Video, ClubStaff, Fixture, ActivityItem, SiteStats, ClubStats } from '@/types';
+import type { Player, NewsArticle, Video, ClubStaff, Fixture, ActivityItem, SiteStats, ClubStats, GalleryItem } from '@/types';
 import { calculateAge } from '@/lib/utils/format';
 import {
   seedPlayers,
@@ -9,9 +9,59 @@ import {
   seedActivity,
   seedSiteStats,
   seedClubStats,
+  seedGallery,
 } from './seed';
 
-import { isSupabaseApiConfigured } from '@/lib/db/env';
+import { isSupabaseApiConfigured, getSupabaseServiceRoleKey } from '@/lib/db/env';
+
+async function getDbClient() {
+  if (getSupabaseServiceRoleKey()) {
+    const { createServiceClient } = await import('@/lib/db/supabase/server');
+    return createServiceClient();
+  }
+  const { createClient } = await import('@/lib/db/supabase/server');
+  return createClient();
+}
+
+function siteStatsFromSeed(): SiteStats {
+  return {
+    registeredPlayers: seedPlayers.length,
+    academyGraduates: seedPlayers.filter((p) => p.academyGraduate).length,
+    playersAbroad: seedPlayers.filter((p) => p.status === 'abroad').length,
+    playersOnTrial: seedPlayers.filter((p) => p.status === 'on_trial').length,
+    scoutRequests: seedSiteStats.scoutRequests,
+    clubMatchesPlayed: seedFixtures.filter((f) => !f.isUpcoming).length,
+    professionalPlacements: seedPlayers.filter((p) => p.professionalPlayer).length,
+  };
+}
+
+function clubStatsFromFixtures(fixtures: Fixture[], playersDeveloped: number, leaguePosition = 0): ClubStats {
+  const played = fixtures.filter((f) => !f.isUpcoming);
+  let wins = 0;
+  let goalsScored = 0;
+  let cleanSheets = 0;
+
+  for (const fixture of played) {
+    const isHome = fixture.homeTeam === 'CBFC';
+    const isAway = fixture.awayTeam === 'CBFC';
+    if (!isHome && !isAway) continue;
+
+    const scored = isHome ? (fixture.homeScore ?? 0) : (fixture.awayScore ?? 0);
+    const conceded = isHome ? (fixture.awayScore ?? 0) : (fixture.homeScore ?? 0);
+    goalsScored += scored;
+    if (conceded === 0) cleanSheets += 1;
+    if (scored > conceded) wins += 1;
+  }
+
+  return {
+    matchesPlayed: played.length,
+    wins,
+    goalsScored,
+    cleanSheets,
+    playersDeveloped,
+    leaguePosition,
+  };
+}
 
 function mapDbPlayer(row: Record<string, unknown>): Player {
   const dob = row.date_of_birth as string;
@@ -228,36 +278,81 @@ export async function getActivity(): Promise<ActivityItem[]> {
 }
 
 export async function getSiteStats(): Promise<SiteStats> {
-  if (!isSupabaseApiConfigured()) return seedSiteStats;
+  if (!isSupabaseApiConfigured()) return siteStatsFromSeed();
 
-  const { createClient } = await import('@/lib/db/supabase/server');
-  const supabase = await createClient();
-  const { data } = await supabase.from('site_stats').select('*').eq('id', 1).single();
-  if (!data) return seedSiteStats;
+  const supabase = await getDbClient();
+
+  const [
+    { count: registeredPlayers },
+    { count: academyGraduates },
+    { count: playersAbroad },
+    { count: playersOnTrial },
+    { count: scoutRequests },
+    { count: clubMatchesPlayed },
+    { count: professionalPlacements },
+  ] = await Promise.all([
+    supabase.from('players').select('*', { count: 'exact', head: true }),
+    supabase.from('players').select('*', { count: 'exact', head: true }).eq('academy_graduate', true),
+    supabase.from('players').select('*', { count: 'exact', head: true }).eq('status', 'abroad'),
+    supabase.from('players').select('*', { count: 'exact', head: true }).eq('status', 'on_trial'),
+    supabase.from('scout_inquiries').select('*', { count: 'exact', head: true }),
+    supabase.from('fixtures').select('*', { count: 'exact', head: true }).eq('is_upcoming', false),
+    supabase.from('players').select('*', { count: 'exact', head: true }).eq('professional_player', true),
+  ]);
+
   return {
-    registeredPlayers: data.registered_players,
-    academyGraduates: data.academy_graduates,
-    playersAbroad: data.players_abroad,
-    playersOnTrial: data.players_on_trial,
-    scoutRequests: data.scout_requests,
-    clubMatchesPlayed: data.club_matches_played,
-    professionalPlacements: data.professional_placements,
+    registeredPlayers: registeredPlayers ?? 0,
+    academyGraduates: academyGraduates ?? 0,
+    playersAbroad: playersAbroad ?? 0,
+    playersOnTrial: playersOnTrial ?? 0,
+    scoutRequests: scoutRequests ?? 0,
+    clubMatchesPlayed: clubMatchesPlayed ?? 0,
+    professionalPlacements: professionalPlacements ?? 0,
   };
 }
 
 export async function getClubStats(): Promise<ClubStats> {
-  if (!isSupabaseApiConfigured()) return seedClubStats;
+  if (!isSupabaseApiConfigured()) {
+    return clubStatsFromFixtures(seedFixtures, seedPlayers.filter((p) => p.academyGraduate).length, seedClubStats.leaguePosition);
+  }
 
-  const { createClient } = await import('@/lib/db/supabase/server');
-  const supabase = await createClient();
-  const { data } = await supabase.from('club_stats').select('*').eq('id', 1).single();
-  if (!data) return seedClubStats;
-  return {
-    matchesPlayed: data.matches_played,
-    wins: data.wins,
-    goalsScored: data.goals_scored,
-    cleanSheets: data.clean_sheets,
-    playersDeveloped: data.players_developed,
-    leaguePosition: data.league_position,
-  };
+  const supabase = await getDbClient();
+  const [{ data: fixtures }, { count: playersDeveloped }, { data: clubRow }] = await Promise.all([
+    supabase.from('fixtures').select('*'),
+    supabase.from('players').select('*', { count: 'exact', head: true }).eq('academy_graduate', true),
+    supabase.from('club_stats').select('league_position').eq('id', 1).maybeSingle(),
+  ]);
+
+  const mappedFixtures: Fixture[] = (fixtures ?? []).map((row) => ({
+    id: row.id,
+    homeTeam: row.home_team,
+    awayTeam: row.away_team,
+    homeScore: row.home_score,
+    awayScore: row.away_score,
+    date: row.match_date,
+    venue: row.venue || '',
+    competition: row.competition || '',
+    isUpcoming: row.is_upcoming,
+  }));
+
+  return clubStatsFromFixtures(
+    mappedFixtures.length ? mappedFixtures : seedFixtures,
+    playersDeveloped ?? 0,
+    clubRow?.league_position ?? 0,
+  );
+}
+
+export async function getGallery(): Promise<GalleryItem[]> {
+  if (!isSupabaseApiConfigured()) return seedGallery;
+
+  const supabase = await getDbClient();
+  const { data } = await supabase.from('gallery_items').select('*').order('sort_order');
+  if (!data?.length) return seedGallery;
+
+  return data.map((row) => ({
+    id: row.id,
+    title: row.title || '',
+    imageUrl: row.image_url,
+    category: row.category || '',
+  }));
 }

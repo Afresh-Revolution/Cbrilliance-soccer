@@ -11,6 +11,7 @@ const adminLinks = [
   { href: '/admin/videos', label: 'Videos' },
   { href: '/admin/applications', label: 'Applications' },
   { href: '/admin/inquiries', label: 'Inquiries' },
+  { href: '/admin/staff', label: 'Staff' },
   { href: '/admin/settings', label: 'Settings' },
 ];
 

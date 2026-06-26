@@ -4,6 +4,10 @@ import { getSupabaseApiUrl, getSupabasePublishableKey } from '@/lib/db/env';
 import { ADMIN_ROLE_SET, roleFromAuthUser } from '@/lib/auth/rbac';
 import type { UserRole } from '@/types';
 
+function isProtectedApiPath(pathname: string): boolean {
+  return pathname.startsWith('/api/admin') || pathname === '/api/upload';
+}
+
 function isAdminPath(pathname: string): boolean {
   return pathname === '/admin' || pathname.startsWith('/admin/');
 }
@@ -46,14 +50,18 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAdminRoute = isAdminPath(pathname);
   const isLoginRoute = isLoginPath(pathname);
+  const isProtectedApi = isProtectedApiPath(pathname);
 
-  if (!isAdminRoute) {
+  if (!isAdminRoute && !isProtectedApi) {
     return NextResponse.next({ request });
   }
 
   const url = getSupabaseApiUrl();
   const anonKey = getSupabasePublishableKey();
   if (!url || !anonKey) {
+    if (isProtectedApi) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     if (!isLoginRoute) {
       return loginRedirect(request);
     }
@@ -79,18 +87,24 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!isLoginRoute) {
+  if (!isLoginRoute || isProtectedApi) {
     if (!user) {
+      if (isProtectedApi) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
       return loginRedirect(request);
     }
 
     const role = await resolveAdminRole(supabase, user);
     if (!role) {
       await supabase.auth.signOut();
+      if (isProtectedApi) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
       return loginRedirect(request, 'access_denied');
     }
 
-    if (pathname.startsWith('/admin/settings') && role !== 'super_admin') {
+    if (isAdminRoute && pathname.startsWith('/admin/settings') && role !== 'super_admin') {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/admin';
       return NextResponse.redirect(redirectUrl);
@@ -111,5 +125,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*', '/api/upload'],
 };

@@ -16,6 +16,15 @@ export type PreferredFoot = 'left' | 'right' | 'both';
 
 export type InquiryStatus = 'new' | 'pending' | 'contacted' | 'closed';
 
+export type ApplicationStatus =
+  | 'new'
+  | 'pending'
+  | 'contacted'
+  | 'closed'
+  | 'reviewed'
+  | 'invited'
+  | 'rejected';
+
 export type UserRole = 'super_admin' | 'content_admin' | 'academy_staff';
 
 export type NewsCategory =
@@ -117,7 +126,7 @@ export interface AcademyApplication {
   email: string;
   phone: string;
   previousClub?: string;
-  status: InquiryStatus;
+  status: ApplicationStatus;
   createdAt: string;
 }
 
@@ -235,4 +244,60 @@ export interface Profile {
   fullName: string;
   role: UserRole;
   createdAt: string;
+}
+
+export interface AdminDashboardStats {
+  totalPlayers: number;
+  activeInquiries: number;
+  academyApplications: number;
+  playersAbroad: number;
+  publishedNews: number;
+  videos: number;
+  upcomingFixtures: number;
+  coachingStaff: number;
+}
+
+export interface AdminInquiryRow {
+  id: string;
+  name: string;
+  subtitle: string;
+  status: InquiryStatus;
+  source: 'scout' | 'contact';
+  createdAt: string;
+}
+
+export interface AdminInquiryDetail {
+  id: string;
+  source: 'scout' | 'contact';
+  name: string;
+  organisation: string;
+  typeLabel: string;
+  status: InquiryStatus;
+  email: string;
+  phone?: string;
+  message?: string;
+  playerId?: string;
+  createdAt: string;
+}
+
+export interface AdminApplicationRow {
+  id: string;
+  name: string;
+  subtitle: string;
+  status: ApplicationStatus;
+  email: string;
+  createdAt: string;
+}
+
+export interface AdminPlayerStatusRow {
+  status: PlayerStatus;
+  label: string;
+  count: number;
+}
+
+export interface AdminDashboardData {
+  stats: AdminDashboardStats;
+  recentInquiries: AdminInquiryRow[];
+  recentApplications: AdminApplicationRow[];
+  playerStatusDistribution: AdminPlayerStatusRow[];
 }

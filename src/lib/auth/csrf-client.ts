@@ -5,21 +5,45 @@ export async function fetchCsrfToken(): Promise<string> {
   return data.csrfToken as string;
 }
 
-export async function postWithCsrf<T = unknown>(
+async function requestWithCsrf<T = unknown>(
   url: string,
-  body: unknown,
+  method: string,
+  body: unknown | undefined,
   csrfToken: string,
 ): Promise<{ ok: boolean; data: T; status: number }> {
   const response = await fetch(url, {
-    method: 'POST',
+    method,
     headers: {
       'Content-Type': 'application/json',
       'x-csrf-token': csrfToken,
     },
     credentials: 'include',
-    body: JSON.stringify(body),
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
   const data = await response.json();
   return { ok: response.ok, data, status: response.status };
+}
+
+export async function postWithCsrf<T = unknown>(
+  url: string,
+  body: unknown,
+  csrfToken: string,
+): Promise<{ ok: boolean; data: T; status: number }> {
+  return requestWithCsrf<T>(url, 'POST', body, csrfToken);
+}
+
+export async function patchWithCsrf<T = unknown>(
+  url: string,
+  body: unknown,
+  csrfToken: string,
+): Promise<{ ok: boolean; data: T; status: number }> {
+  return requestWithCsrf<T>(url, 'PATCH', body, csrfToken);
+}
+
+export async function deleteWithCsrf<T = unknown>(
+  url: string,
+  csrfToken: string,
+): Promise<{ ok: boolean; data: T; status: number }> {
+  return requestWithCsrf<T>(url, 'DELETE', undefined, csrfToken);
 }

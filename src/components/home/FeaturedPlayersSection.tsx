@@ -4,7 +4,8 @@ import FadeIn from '@/components/common/FadeIn';
 import Button from '@/components/common/Button';
 
 export default async function FeaturedPlayersSection() {
-  const players = await getPlayers({ featured: true });
+  const featured = await getPlayers({ featured: true });
+  const players = featured.length > 0 ? featured : await getPlayers();
 
   return (
     <section className="section section--surface">

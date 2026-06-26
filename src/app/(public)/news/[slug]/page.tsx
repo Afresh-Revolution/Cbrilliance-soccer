@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { getNewsBySlug } from '@/lib/data/queries';
 import { NEWS_CATEGORY_LABELS } from '@/lib/constants/navigation';
 import { formatDate } from '@/lib/utils/format';
+import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -24,6 +25,8 @@ export default async function NewsArticlePage({ params }: Props) {
   const article = await getNewsBySlug(slug);
   if (!article) notFound();
 
+  const safeContent = sanitizeRichHtml(article.content);
+
   return (
     <>
       <section className="page-hero">
@@ -44,7 +47,7 @@ export default async function NewsArticlePage({ params }: Props) {
             </div>
             <div
               className="article-content"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: safeContent }}
             />
           </div>
         </div>

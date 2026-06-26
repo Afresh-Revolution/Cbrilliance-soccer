@@ -1,7 +1,7 @@
 import type { UserRole, Profile } from '@/types';
 import { createClient, createServiceClient } from '@/lib/db/supabase/server';
 import { isSupabaseApiConfigured, isSupabaseServiceConfigured } from '@/lib/db/env';
-import { roleFromAuthUser } from '@/lib/auth/rbac';
+import { roleFromAuthUser, isAdminRole } from '@/lib/auth/rbac';
 export interface AuthContext {
   userId: string;
   email: string;
@@ -60,7 +60,7 @@ export async function getProfileWithServiceRole(userId: string): Promise<Profile
   return mapProfile(data);
 }
 
-/** Ensures an auth user has an admin profile row (recovery after partial seed). */
+/** Ensures an auth user has a profile row matching their invited admin role. */
 export async function ensureAdminProfile(userId: string, email: string): Promise<Profile | null> {
   if (!isSupabaseServiceConfigured()) return null;
 
@@ -74,13 +74,19 @@ export async function ensureAdminProfile(userId: string, email: string): Promise
   }
 
   const supabase = await createServiceClient();
+  const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
+  if (userError || !userData.user) return null;
+
+  const metaRole = roleFromAuthUser(userData.user);
+  if (!metaRole || !isAdminRole(metaRole)) return null;
+
   const { data, error } = await supabase
     .from('profiles')
     .upsert({
       id: userId,
       email,
-      full_name: 'CBFC Admin',
-      role: 'super_admin',
+      full_name: (userData.user.user_metadata?.full_name as string) || 'CBFC Admin',
+      role: metaRole,
     })
     .select('id, email, full_name, role, created_at')
     .single();

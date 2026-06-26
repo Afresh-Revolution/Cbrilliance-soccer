@@ -4,9 +4,10 @@ import { isSupabaseServiceConfigured } from '@/lib/db/env';
 import { guardPublicPost } from '@/lib/security/api-guard';
 import { sanitizeText } from '@/lib/security/sanitize';
 import { writeAuditLog } from '@/lib/security/audit';
+import { notifyContactSubmission } from '@/lib/email/notifications';
 
 export async function POST(request: NextRequest) {
-  const blocked = guardPublicPost(request, 'contact-form', 8, 60 * 60 * 1000);
+  const blocked = await guardPublicPost(request, 'contact-form', 8, 60 * 60 * 1000);
   if (blocked) return blocked;
 
   try {
@@ -36,6 +37,14 @@ export async function POST(request: NextRequest) {
       resource: 'contact_inquiries',
       request,
       metadata: { email: data.email },
+    });
+
+    notifyContactSubmission({
+      fullName: data.fullName,
+      email: data.email.toLowerCase().trim(),
+      organization: data.organization,
+      phone: data.phone,
+      message: data.message,
     });
 
     return NextResponse.json({ success: true });

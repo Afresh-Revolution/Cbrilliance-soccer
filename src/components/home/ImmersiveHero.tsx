@@ -5,9 +5,43 @@ import Link from 'next/link';
 import Button from '@/components/common/Button';
 import TypewriterText from '@/components/home/TypewriterText';
 import HeroPlayerCarousel from '@/components/home/HeroPlayerCarousel';
-import { seedPlayers } from '@/lib/data/seed';
+import type { Player, SiteStats } from '@/types';
 
-export default function ImmersiveHero() {
+interface Props {
+  players: Player[];
+  stats: SiteStats;
+}
+
+function formatStat(value: number, suffix = '') {
+  if (value >= 100) return `${value}+`;
+  return `${value}${suffix}`;
+}
+
+export default function ImmersiveHero({ players, stats }: Props) {
+  const pillars = [
+    {
+      stat: formatStat(stats.registeredPlayers),
+      label: 'Registered Players',
+      title: 'Academy',
+      desc: 'Elite youth development',
+      href: '/academy',
+    },
+    {
+      stat: formatStat(stats.academyGraduates),
+      label: 'Academy Graduates',
+      title: 'Agency',
+      desc: 'Global representation',
+      href: '/agency',
+    },
+    {
+      stat: formatStat(stats.professionalPlacements),
+      label: 'Pro Placements',
+      title: 'Club',
+      desc: 'Professional competition',
+      href: '/club',
+    },
+  ];
+
   return (
     <section className="immersive-hero">
       <div className="mesh-glow mesh-glow--blue" style={{ width: 500, height: 500, top: '10%', right: '5%' }} />
@@ -34,11 +68,7 @@ export default function ImmersiveHero() {
           </div>
 
           <div className="immersive-hero__pillars">
-            {[
-              { stat: '156+', label: 'Registered Players', title: 'Academy', desc: 'Elite youth development', href: '/academy' },
-              { stat: '42', label: 'Academy Graduates', title: 'Agency', desc: 'Global representation', href: '/agency' },
-              { stat: '12', label: 'Pro Placements', title: 'Club', desc: 'Professional competition', href: '/club' },
-            ].map((pillar, i) => (
+            {pillars.map((pillar, i) => (
               <motion.div
                 key={pillar.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -65,7 +95,7 @@ export default function ImmersiveHero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          <HeroPlayerCarousel players={seedPlayers} />
+          <HeroPlayerCarousel players={players} />
         </motion.div>
       </div>
     </section>

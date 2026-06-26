@@ -34,6 +34,23 @@ export const STATUS_LABELS: Record<string, string> = {
   in_camp: 'In Camp',
 };
 
+export const APPLICATION_STATUS_LABELS: Record<string, string> = {
+  new: 'New',
+  reviewed: 'Reviewed',
+  invited: 'Invited',
+  rejected: 'Rejected',
+  pending: 'Pending',
+  contacted: 'Contacted',
+  closed: 'Closed',
+};
+
+export const INQUIRY_STATUS_LABELS: Record<string, string> = {
+  new: 'New',
+  pending: 'Pending',
+  contacted: 'Contacted',
+  closed: 'Closed',
+};
+
 export const POSITION_LABELS: Record<string, string> = {
   goalkeeper: 'Goalkeeper',
   defender: 'Defender',

@@ -1,58 +1,37 @@
-import { getPlayers, getSiteStats } from '@/lib/data/queries';
+import { getAdminDashboard } from '@/lib/data/admin-queries';
+import { getPlayers } from '@/lib/data/queries';
+import {
+  AdminApplicationsPanel,
+  AdminInquiriesPanel,
+  AdminQuickActions,
+  AdminRecentPlayersTable,
+  AdminStatsGrid,
+  AdminStatusDistribution,
+} from '@/components/admin/AdminDashboardPanels';
 
-export default async function AdminDashboard() {
-  const stats = await getSiteStats();
-  const players = await getPlayers();
+export default async function AdminDashboardPage() {
+  const [dashboard, players] = await Promise.all([getAdminDashboard(), getPlayers()]);
 
   return (
     <>
       <div className="admin__header">
         <h1>Dashboard</h1>
-        <p className="text-muted">Welcome to the CBFC admin panel</p>
+        <p className="text-muted">Overview of players, inquiries, content, and club operations</p>
       </div>
 
-      <div className="admin__stats-grid">
-        <div className="admin__stat-card">
-          <h3>{stats.registeredPlayers}</h3>
-          <p>Registered Players</p>
-        </div>
-        <div className="admin__stat-card">
-          <h3>{players.length}</h3>
-          <p>Active Profiles</p>
-        </div>
-        <div className="admin__stat-card">
-          <h3>{stats.scoutRequests}</h3>
-          <p>Scout Requests</p>
-        </div>
-        <div className="admin__stat-card">
-          <h3>{stats.professionalPlacements}</h3>
-          <p>Pro Placements</p>
-        </div>
+      <AdminStatsGrid stats={dashboard.stats} />
+
+      <div className="admin-dash__grid admin-dash__grid--2">
+        <AdminInquiriesPanel items={dashboard.recentInquiries} />
+        <AdminApplicationsPanel items={dashboard.recentApplications} />
       </div>
 
-      <h2 className="mb-md">Recent Players</h2>
-      <div className="admin__table-wrap">
-        <table className="admin__table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Status</th>
-            <th>Nationality</th>
-          </tr>
-        </thead>
-        <tbody>
-          {players.slice(0, 5).map((p) => (
-            <tr key={p.id}>
-              <td>{p.fullName}</td>
-              <td style={{ textTransform: 'capitalize' }}>{p.position}</td>
-              <td style={{ textTransform: 'capitalize' }}>{p.status.replace(/_/g, ' ')}</td>
-              <td>{p.nationality}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="admin-dash__grid admin-dash__grid--2">
+        <AdminStatusDistribution rows={dashboard.playerStatusDistribution} />
+        <AdminQuickActions />
       </div>
+
+      <AdminRecentPlayersTable players={players} />
     </>
   );
 }

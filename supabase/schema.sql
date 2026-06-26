@@ -1,5 +1,11 @@
 -- CBFC Database Schema for Supabase
--- Run this in Supabase SQL Editor
+-- Run this in Supabase SQL Editor for a fresh project.
+--
+-- Tables: profiles, players, academy_applications, scout_inquiries,
+--         contact_inquiries, news_articles, videos, club_staff, fixtures,
+--         gallery_items, activity_items, site_stats, club_stats, audit_logs
+--
+-- Existing projects: run migrations in order (002 → 003 → 004) instead.
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -33,7 +39,11 @@ CREATE TABLE IF NOT EXISTS players (
   videos JSONB DEFAULT '[]',
   images JSONB DEFAULT '[]',
   movement_history JSONB DEFAULT '[]',
-  status TEXT NOT NULL DEFAULT 'in_development',
+  status TEXT NOT NULL DEFAULT 'in_development'
+    CHECK (status IN (
+      'available_for_trials', 'on_trial', 'abroad',
+      'in_development', 'professional_squad', 'in_camp'
+    )),
   academy_graduate BOOLEAN DEFAULT FALSE,
   professional_player BOOLEAN DEFAULT FALSE,
   jersey_number INTEGER,
@@ -54,7 +64,7 @@ CREATE TABLE IF NOT EXISTS academy_applications (
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   previous_club TEXT,
-  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'pending', 'contacted', 'closed')),
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'pending', 'contacted', 'closed', 'reviewed', 'invited', 'rejected')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -192,6 +202,8 @@ ALTER TABLE club_staff ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fixtures ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE site_stats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE club_stats ENABLE ROW LEVEL SECURITY;
 
 -- Public read policies
 DROP POLICY IF EXISTS "Public read players" ON players;
@@ -254,6 +266,26 @@ DROP POLICY IF EXISTS "Admin update contact inquiries" ON contact_inquiries;
 CREATE POLICY "Admin update contact inquiries" ON contact_inquiries FOR UPDATE USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid())
 );
+DROP POLICY IF EXISTS "Admin delete scout inquiries" ON scout_inquiries;
+CREATE POLICY "Admin delete scout inquiries" ON scout_inquiries FOR DELETE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid())
+);
+DROP POLICY IF EXISTS "Admin delete contact inquiries" ON contact_inquiries;
+CREATE POLICY "Admin delete contact inquiries" ON contact_inquiries FOR DELETE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid())
+);
+DROP POLICY IF EXISTS "Admin full access videos" ON videos;
+CREATE POLICY "Admin full access videos" ON videos FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
+);
+DROP POLICY IF EXISTS "Admin full access fixtures" ON fixtures;
+CREATE POLICY "Admin full access fixtures" ON fixtures FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
+);
+DROP POLICY IF EXISTS "Admin full access club staff" ON club_staff;
+CREATE POLICY "Admin full access club staff" ON club_staff FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
+);
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_players_slug ON players(slug);
@@ -262,6 +294,15 @@ CREATE INDEX IF NOT EXISTS idx_players_featured ON players(featured);
 CREATE INDEX IF NOT EXISTS idx_news_slug ON news_articles(slug);
 CREATE INDEX IF NOT EXISTS idx_news_category ON news_articles(category);
 CREATE INDEX IF NOT EXISTS idx_videos_featured ON videos(featured);
+CREATE INDEX IF NOT EXISTS idx_videos_created_at ON videos(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_news_published ON news_articles(published);
+CREATE INDEX IF NOT EXISTS idx_club_staff_sort_order ON club_staff(sort_order);
+CREATE INDEX IF NOT EXISTS idx_scout_inquiries_status ON scout_inquiries(status);
+CREATE INDEX IF NOT EXISTS idx_scout_inquiries_created ON scout_inquiries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_inquiries_status ON contact_inquiries(status);
+CREATE INDEX IF NOT EXISTS idx_contact_inquiries_created ON contact_inquiries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_academy_applications_status ON academy_applications(status);
+CREATE INDEX IF NOT EXISTS idx_academy_applications_created ON academy_applications(created_at DESC);
 
 -- Updated at trigger
 CREATE OR REPLACE FUNCTION update_updated_at()

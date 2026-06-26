@@ -5,7 +5,9 @@
   "packageManager": "bun@1.2.0",
   "scripts": {
     "dev": "next dev",
+    "clean": "bun -e \"try{require('fs').rmSync('.next',{recursive:true,force:true})}catch(e){}\"",
     "build": "next build",
+    "build:clean": "bun run clean && bun run build",
     "start": "next start",
     "lint": "next lint",
     "seed-admin": "bun run scripts/seed-admin.ts",
@@ -20,6 +22,7 @@
     "next": "^15.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "resend": "^6.16.0",
     "sass": "^1.85.0",
     "zod": "^3.24.2"
   },

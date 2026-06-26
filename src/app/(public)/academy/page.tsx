@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Button from '@/components/common/Button';
 import FadeIn from '@/components/common/FadeIn';
-import { seedGallery } from '@/lib/data/seed';
+import { postPublicForm } from '@/lib/auth/public-form-client';
+import { CBFC_MEDIA } from '@/lib/data/cbfc-media';
 
 const ageCategories = ['U10', 'U13', 'U15', 'U17', 'U19'];
 const programs = [
@@ -15,11 +16,11 @@ const programs = [
   { title: 'Leadership Development', desc: 'Captaincy training, communication, and team responsibility.' },
 ];
 const facilities = [
-  { name: 'Training Ground', image: seedGallery[0].imageUrl },
-  { name: 'Gym', image: seedGallery[1].imageUrl },
-  { name: 'Classrooms', image: seedGallery[2].imageUrl },
-  { name: 'Medical Support', image: seedGallery[3].imageUrl },
-  { name: 'Recovery Area', image: seedGallery[0].imageUrl },
+  { name: 'Training Ground', image: CBFC_MEDIA.tata.action },
+  { name: 'Gym', image: CBFC_MEDIA.tata.action2 },
+  { name: 'Classrooms', image: CBFC_MEDIA.chocho.action },
+  { name: 'Medical Support', image: CBFC_MEDIA.chocho.back },
+  { name: 'Recovery Area', image: CBFC_MEDIA.tata.action },
 ];
 
 export default function AcademyPage() {
@@ -32,12 +33,8 @@ export default function AcademyPage() {
     const data = Object.fromEntries(formData);
 
     try {
-      const res = await fetch('/api/academy-applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error('Submission failed');
+      const { ok } = await postPublicForm('/api/academy-applications', data);
+      if (!ok) throw new Error('Submission failed');
       setFormState({ loading: false, success: true, error: '' });
       (e.target as HTMLFormElement).reset();
     } catch {

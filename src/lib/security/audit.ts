@@ -11,7 +11,22 @@ export type AuditAction =
   | 'form.contact'
   | 'form.academy'
   | 'form.scout'
-  | 'admin.access_denied';
+  | 'admin.access_denied'
+  | 'player.create'
+  | 'player.update'
+  | 'player.delete'
+  | 'news.create'
+  | 'news.update'
+  | 'news.delete'
+  | 'video.create'
+  | 'video.update'
+  | 'video.delete'
+  | 'application.update'
+  | 'inquiry.update'
+  | 'inquiry.delete'
+  | 'staff.create'
+  | 'staff.update'
+  | 'staff.delete';
 
 interface AuditParams {
   action: AuditAction;

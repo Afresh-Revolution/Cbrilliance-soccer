@@ -14,6 +14,8 @@ const dmSans = DM_Sans({
   weight: ['400', '500', '600', '700'],
 });
 
+const CBFC_LOGO = '/media/CBFC%20Logo.jpg';
+
 export const metadata: Metadata = {
   title: {
     default: 'CBFC — Community Based Football Club',
@@ -21,10 +23,16 @@ export const metadata: Metadata = {
   },
   description:
     'CBFC develops, represents, and advances football talent through our Academy, Agency, and Professional Club structure.',
+  icons: {
+    icon: [{ url: CBFC_LOGO, type: 'image/jpeg' }],
+    apple: CBFC_LOGO,
+    shortcut: CBFC_LOGO,
+  },
   openGraph: {
     type: 'website',
     locale: 'en_GB',
     siteName: 'CBFC',
+    images: [{ url: CBFC_LOGO, alt: 'CBFC Logo' }],
   },
   twitter: {
     card: 'summary_large_image',

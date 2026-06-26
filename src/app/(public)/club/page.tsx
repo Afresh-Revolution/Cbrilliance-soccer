@@ -1,11 +1,10 @@
-import { getPlayers, getClubStaff, getFixtures, getClubStats } from '@/lib/data/queries';
+import { getPlayers, getClubStaff, getFixtures, getClubStats, getGallery } from '@/lib/data/queries';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
 import { formatDate } from '@/lib/utils/format';
 import AnimatedCounter from '@/components/common/AnimatedCounter';
 import FadeIn from '@/components/common/FadeIn';
 import Button from '@/components/common/Button';
 import Image from 'next/image';
-import { seedGallery } from '@/lib/data/seed';
 
 export const metadata = {
   title: 'Professional Club',
@@ -13,11 +12,12 @@ export const metadata = {
 };
 
 export default async function ClubPage() {
-  const [squad, staff, fixtures, stats] = await Promise.all([
+  const [squad, staff, fixtures, stats, gallery] = await Promise.all([
     getPlayers({ status: 'professional_squad' }),
     getClubStaff(),
     getFixtures(),
     getClubStats(),
+    getGallery(),
   ]);
 
   const upcoming = fixtures.filter((f) => f.isUpcoming);
@@ -159,7 +159,7 @@ export default async function ClubPage() {
         <div className="container">
           <h2 className="text-center mb-lg">Club Gallery</h2>
           <div className="grid grid--3">
-            {seedGallery.map((g, i) => (
+            {gallery.map((g, i) => (
               <FadeIn key={g.id} index={i}>
                 <div className="facility-card">
                   {/* eslint-disable-next-line @next/next/no-img-element */}

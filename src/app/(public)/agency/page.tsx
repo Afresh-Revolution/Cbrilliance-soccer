@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import FadeIn from '@/components/common/FadeIn';
 import Button from '@/components/common/Button';
+import { postPublicForm } from '@/lib/auth/public-form-client';
 
 const services = [
   { title: 'Player Representation', desc: 'Full-service representation for developing and professional players.' },
@@ -22,12 +23,8 @@ export default function AgencyPage() {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const res = await fetch('/api/scout-inquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.fromEntries(formData)),
-      });
-      if (!res.ok) throw new Error('Failed');
+      const { ok } = await postPublicForm('/api/scout-inquiries', Object.fromEntries(formData));
+      if (!ok) throw new Error('Failed');
       setFormState({ loading: false, success: true, error: '' });
       (e.target as HTMLFormElement).reset();
     } catch {

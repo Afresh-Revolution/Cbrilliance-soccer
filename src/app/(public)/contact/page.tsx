@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Button from '@/components/common/Button';
+import { postPublicForm } from '@/lib/auth/public-form-client';
 
 export default function ContactPage() {
   const [formState, setFormState] = useState({ loading: false, success: false, error: '' });
@@ -12,12 +13,8 @@ export default function ContactPage() {
 
     try {
       const formData = new FormData(e.currentTarget);
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.fromEntries(formData)),
-      });
-      if (!res.ok) throw new Error('Failed');
+      const { ok } = await postPublicForm('/api/contact', Object.fromEntries(formData));
+      if (!ok) throw new Error('Failed');
       setFormState({ loading: false, success: true, error: '' });
       (e.target as HTMLFormElement).reset();
     } catch {
