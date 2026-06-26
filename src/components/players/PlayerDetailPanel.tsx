@@ -13,8 +13,9 @@ import GoalsSeasonChart from '@/components/players/GoalsSeasonChart';
 
 import { getCountryCode } from '@/lib/constants/countries';
 
-const FALLBACK_PHOTO =
-  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=800&fit=crop';
+import { CBFC_FALLBACK_PLAYER_PHOTO } from '@/lib/data/cbfc-media';
+
+const FALLBACK_PHOTO = CBFC_FALLBACK_PLAYER_PHOTO;
 
 function seasonGoals(player: Player) {
   const total = player.statistics.goals;

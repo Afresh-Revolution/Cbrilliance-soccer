@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { NAV_LINKS } from '@/lib/constants/navigation';
+import { CBFC_MEDIA } from '@/lib/data/cbfc-media';
 import Button from '@/components/common/Button';
 import MenuBallToggle from '@/components/layout/MenuBallToggle';
 import MobileNavDrawer from '@/components/layout/MobileNavDrawer';
@@ -32,7 +34,18 @@ export default function Header() {
       >
         <div className="header__inner container container--wide">
           <Link href="/" className="header__logo">
-            CBFC
+            {CBFC_MEDIA.logo ? (
+              <Image
+                src={CBFC_MEDIA.logo}
+                alt="CBFC"
+                width={120}
+                height={40}
+                className="header__logo-img"
+                priority
+              />
+            ) : (
+              'CBFC'
+            )}
           </Link>
 
           <nav className="header__nav" aria-label="Main navigation">

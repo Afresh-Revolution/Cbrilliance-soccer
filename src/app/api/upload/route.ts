@@ -3,7 +3,7 @@ import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
 import { handleAuthError } from '@/lib/security/api-guard';
 import { uploadRequestSchema } from '@/lib/validators/schemas';
-import { generateMediaKey, getUploadUrl } from '@/lib/storage/b2';
+import { generateMediaKey, getUploadUrl, getPublicUrl } from '@/lib/storage/b2';
 import { isAllowedUpload, sanitizeFolder, MAX_UPLOAD_BYTES } from '@/lib/security/sanitize';
 import { guardAuthPost } from '@/lib/security/api-guard';
 import { validateCsrf } from '@/lib/security/csrf';
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const safeFolder = sanitizeFolder(folder);
     const key = generateMediaKey(safeFolder, filename);
-    const uploadUrl = await getUploadUrl(key, contentType);
+    const upload = await getUploadUrl(key, contentType);
 
     await writeAuditLog({
       action: 'upload.presign',
@@ -50,7 +50,13 @@ export async function POST(request: NextRequest) {
       request,
     });
 
-    return NextResponse.json({ uploadUrl, key });
+    return NextResponse.json({
+      key,
+      uploadUrl: upload.uploadUrl,
+      authorizationToken: upload.authorizationToken,
+      contentType: upload.contentType,
+      publicUrl: getPublicUrl(key),
+    });
   } catch (error) {
     return handleAuthError(error);
   }

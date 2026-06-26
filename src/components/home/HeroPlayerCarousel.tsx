@@ -35,7 +35,6 @@ export default function HeroPlayerCarousel({ players }: Props) {
   return (
     <div className="hero-carousel">
       <div className="hero-carousel__frame">
-        <div className="hero-carousel__glow" />
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}

@@ -44,6 +44,12 @@
     display: flex;
     align-items: center;
     @include gold-gradient-text;
+
+    &-img {
+      width: auto;
+      height: 40px;
+      object-fit: contain;
+    }
   }
 
   &__nav {

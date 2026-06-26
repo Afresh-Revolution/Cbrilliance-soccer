@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed-admin": "bun run scripts/seed-admin.ts"
+    "seed-admin": "bun run scripts/seed-admin.ts",
+    "upload-cbfc-assets": "bun run scripts/upload-cbfc-assets.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",

@@ -94,6 +94,14 @@ supabase/        # Database schema
 
 Use `POST /api/upload` with `{ filename, contentType, folder }` to get a presigned Backblaze B2 upload URL.
 
+To publish CBFC player photos and logo from `assets/media/` to B2 and sync Supabase:
+
+```bash
+bun --env-file=.env run upload-cbfc-assets
+```
+
+In local dev, images are served from `public/media/` until production (or set `NEXT_PUBLIC_USE_B2_MEDIA=true` to test B2 URLs locally).
+
 ## Admin
 
 1. Create a user in Supabase Auth

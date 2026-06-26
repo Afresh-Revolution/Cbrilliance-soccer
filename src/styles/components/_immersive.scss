@@ -191,30 +191,14 @@
   &__frame {
     position: relative;
     aspect-ratio: 3 / 4;
-    border-radius: 28px;
-    overflow: hidden;
-    border: 1px solid rgba($color-premium-gold, 0.2);
-    background: linear-gradient(165deg, rgba($color-navy-elevated, 0.9), rgba($color-midnight, 0.95));
-    box-shadow:
-      0 32px 80px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba($color-white, 0.04) inset,
-      0 0 60px rgba($color-accent-blue, 0.15);
-  }
-
-  &__glow {
-    position: absolute;
-    inset: -1px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, rgba($color-premium-gold, 0.35), transparent 40%, rgba($color-accent-blue, 0.25));
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.6;
+    overflow: visible;
   }
 
   &__slide {
     position: absolute;
     inset: 0;
     z-index: 1;
+    overflow: hidden;
   }
 
   &__img {

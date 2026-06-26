@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Player } from '@/types';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
 import { seedFixtures } from '@/lib/data/seed';
+import { CBFC_FALLBACK_PLAYER_PHOTO } from '@/lib/data/cbfc-media';
 import PillTabs from '@/components/common/PillTabs';
 import PlayerDetailPanel from '@/components/players/PlayerDetailPanel';
 
@@ -18,8 +19,7 @@ const POSITIONS = [
   { id: 'forward', label: 'Forwards' },
 ];
 
-const FALLBACK_PHOTO =
-  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=800&fit=crop';
+const FALLBACK_PHOTO = CBFC_FALLBACK_PLAYER_PHOTO;
 
 function splitName(fullName: string) {
   const parts = fullName.trim().split(' ');
