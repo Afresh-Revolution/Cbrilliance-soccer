@@ -147,7 +147,7 @@ export const seedNews: NewsArticle[] = [
 export const seedVideos: Video[] = [
   {
     id: 'v1',
-    title: 'Tata — Season Highlights',
+    title: 'Tata: Season Highlights',
     thumbnail: CBFC_MEDIA.tata.side,
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     playerId: '1',
@@ -160,7 +160,7 @@ export const seedVideos: Video[] = [
   },
   {
     id: 'v2',
-    title: 'Chocho — Midfield Masterclass',
+    title: 'Chocho: Midfield Masterclass',
     thumbnail: CBFC_MEDIA.chocho.side,
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     playerId: '2',
@@ -173,7 +173,7 @@ export const seedVideos: Video[] = [
   },
   {
     id: 'v3',
-    title: 'Academy Training Session — Technical Drills',
+    title: 'Academy Training Session: Technical Drills',
     thumbnail: CBFC_MEDIA.tata.action,
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     position: 'midfielder',
@@ -184,7 +184,7 @@ export const seedVideos: Video[] = [
   },
   {
     id: 'v4',
-    title: 'Chocho — Skills Compilation',
+    title: 'Chocho: Skills Compilation',
     thumbnail: CBFC_MEDIA.chocho.action,
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     playerId: '2',
@@ -213,8 +213,8 @@ export const seedFixtures: Fixture[] = [
 ];
 
 export const seedActivity: ActivityItem[] = [
-  { id: 'act1', type: 'trial', title: 'Tata — European Trial', description: 'Invited for trial with Portuguese club', date: '2024-11-20', playerId: '1' },
-  { id: 'act2', type: 'achievement', title: 'Chocho — Player of the Month', description: 'Named league midfielder of the month', date: '2024-09-01', playerId: '2' },
+  { id: 'act1', type: 'trial', title: 'Tata: European Trial', description: 'Invited for trial with Portuguese club', date: '2024-11-20', playerId: '1' },
+  { id: 'act2', type: 'achievement', title: 'Chocho: Player of the Month', description: 'Named league midfielder of the month', date: '2024-09-01', playerId: '2' },
   { id: 'act3', type: 'camp', title: 'Elite Winter Camp Begins', description: '30 players selected for intensive camp programme', date: '2024-12-20' },
   { id: 'act4', type: 'club', title: 'CBFC Wins 3-1', description: 'Dominant home performance against City Rangers', date: '2025-01-05' },
   { id: 'act5', type: 'agency', title: 'New European Partnership', description: 'CBFC Agency signs partnership with Belgian club', date: '2024-12-15' },
@@ -240,8 +240,8 @@ export const seedClubStats: ClubStats = {
 };
 
 export const seedGallery: GalleryItem[] = [
-  { id: 'g1', title: 'Tata — In Action', imageUrl: CBFC_MEDIA.tata.action, category: 'training' },
-  { id: 'g2', title: 'Tata — Match Day', imageUrl: CBFC_MEDIA.tata.action2, category: 'matchday' },
-  { id: 'g3', title: 'Chocho — In Action', imageUrl: CBFC_MEDIA.chocho.action, category: 'training' },
-  { id: 'g4', title: 'Chocho — Tournament', imageUrl: CBFC_MEDIA.chocho.back, category: 'tournament' },
+  { id: 'g1', title: 'Tata: In Action', imageUrl: CBFC_MEDIA.tata.action, category: 'training' },
+  { id: 'g2', title: 'Tata: Match Day', imageUrl: CBFC_MEDIA.tata.action2, category: 'matchday' },
+  { id: 'g3', title: 'Chocho: In Action', imageUrl: CBFC_MEDIA.chocho.action, category: 'training' },
+  { id: 'g4', title: 'Chocho: Tournament', imageUrl: CBFC_MEDIA.chocho.back, category: 'tournament' },
 ];

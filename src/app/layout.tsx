@@ -18,7 +18,7 @@ const CBFC_LOGO = '/media/CBFC%20Logo.jpg';
 
 export const metadata: Metadata = {
   title: {
-    default: 'CBFC — Community Based Football Club',
+    default: 'CBFC | The Innovational Football Club',
     template: '%s | CBFC',
   },
   description:

@@ -33,7 +33,7 @@ export default function VideoHubPage() {
         <div className="container">
           <p className="label">Scouting Media</p>
           <h1>Video <span className="text-gold">Hub</span></h1>
-          <p>Premium scouting footage — player highlights, match clips, and training sessions.</p>
+          <p>Premium scouting footage: player highlights, match clips, and training sessions.</p>
         </div>
       </section>
 

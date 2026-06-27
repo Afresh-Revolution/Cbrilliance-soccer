@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="footer__brand">
             <h3>CBFC</h3>
             <p>
-              Community Based Football Club — developing, representing, and advancing
+              The Innovational Football Club, developing, representing, and advancing
               football talent through our Academy, Agency, and Professional Club structure.
             </p>
           </div>

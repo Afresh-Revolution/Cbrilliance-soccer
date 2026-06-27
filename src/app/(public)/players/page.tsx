@@ -5,7 +5,7 @@ import PlayerShowcase from '@/components/players/PlayerShowcase';
 
 export const metadata: Metadata = {
   title: 'Players',
-  description: 'Discover CBFC talent — immersive player discovery.',
+  description: 'Discover CBFC talent through immersive player discovery.',
 };
 
 export default async function PlayersPage() {

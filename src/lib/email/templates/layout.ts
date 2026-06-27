@@ -31,7 +31,7 @@ export function renderEmailLayout(options: EmailLayoutOptions): string {
   const title = escapeHtml(options.title);
   const footerNote = options.footerNote
     ? escapeHtml(options.footerNote)
-    : 'Community Based Football Club — Developing tomorrow\'s stars.';
+    : 'The Innovational Football Club, developing, representing, and advancing football talent through our Academy, Agency, and Professional Club structure.';
 
   const ctaBlock =
     options.ctaLabel && options.ctaHref
@@ -73,7 +73,7 @@ export function renderEmailLayout(options: EmailLayoutOptions): string {
                 <img src="${escapeHtml(logoUrl)}" alt="CBFC" width="72" height="72" style="display: block; margin: 0 auto 16px; border-radius: 8px;" />
               </a>
               <p style="margin: 0; font-family: 'Syne', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: ${EMAIL_COLORS.gold};">
-                Community Based Football Club
+                The Innovational Football Club
               </p>
             </td>
           </tr>

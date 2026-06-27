@@ -59,7 +59,7 @@ export default function ImmersiveHero({ players, stats }: Props) {
             From Talent To <TypewriterText />
           </h1>
           <p className="immersive-hero__subtitle">
-            An immersive football ecosystem — Academy, Agency, and Professional Club united under one elite pathway.
+            An immersive football ecosystem with Academy, Agency, and Professional Club united under one elite pathway.
           </p>
 
           <div className="immersive-hero__ctas">

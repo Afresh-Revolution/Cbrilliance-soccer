@@ -30,7 +30,7 @@ export default function AboutSection() {
           <p className="label">About CBFC</p>
           <h2>A Complete Football Ecosystem</h2>
           <p>
-            CBFC is more than a club — we are a comprehensive football ecosystem
+            CBFC is more than a club. We are a comprehensive football ecosystem
             connecting youth development, player representation, and professional
             competition under one elite brand.
           </p>

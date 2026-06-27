@@ -14,7 +14,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <p className="label mb-md">Community Based Football Club</p>
+          <p className="label mb-md">The Innovational Football Club</p>
           <h1 className="hero__headline">
             From Talent Discovery To{' '}
             <span className="text-gold">Professional Success</span>

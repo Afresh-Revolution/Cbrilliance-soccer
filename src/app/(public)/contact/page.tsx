@@ -106,7 +106,7 @@ export default function ContactPage() {
           </div>
 
           <div className="map-placeholder mt-xl">
-            Google Maps integration ready — embed your map iframe here
+            Google Maps integration ready. Embed your map iframe here.
           </div>
         </div>
       </section>

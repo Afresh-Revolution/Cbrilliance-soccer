@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 export const metadata = {
   title: 'Professional Club',
-  description: 'CBFC Professional — representing excellence on the pitch.',
+  description: 'CBFC Professional, representing excellence on the pitch.',
 };
 
 export default async function ClubPage() {
