@@ -2,6 +2,7 @@ import { getAdminDashboard } from '@/lib/data/admin-queries';
 import { getPlayers } from '@/lib/data/queries';
 import {
   AdminApplicationsPanel,
+  AdminGalleryPanel,
   AdminInquiriesPanel,
   AdminQuickActions,
   AdminRecentPlayersTable,
@@ -28,9 +29,10 @@ export default async function AdminDashboardPage() {
 
       <div className="admin-dash__grid admin-dash__grid--2">
         <AdminStatusDistribution rows={dashboard.playerStatusDistribution} />
-        <AdminQuickActions />
+        <AdminGalleryPanel items={dashboard.recentGallery} />
       </div>
 
+      <AdminQuickActions />
       <AdminRecentPlayersTable players={players} />
     </>
   );

@@ -204,3 +204,12 @@ export const adminStaffSchema = z.object({
 });
 
 export const adminStaffPatchSchema = adminStaffSchema.partial();
+
+export const adminGallerySchema = z.object({
+  title: z.string().min(1, 'Title is required').max(120),
+  imageUrl: z.string().min(1, 'Image is required').max(2048),
+  category: z.string().max(50).optional(),
+  sortOrder: z.coerce.number().int().min(0).optional(),
+});
+
+export const adminGalleryPatchSchema = adminGallerySchema.partial();

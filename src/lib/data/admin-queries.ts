@@ -5,6 +5,7 @@ import type {
   AdminInquiryRow,
   AdminPlayerStatusRow,
   ApplicationStatus,
+  GalleryItem,
   InquiryStatus,
   PlayerStatus,
 } from '@/types';
@@ -49,10 +50,12 @@ function dashboardFromSeed(): AdminDashboardData {
       videos: 0,
       upcomingFixtures: 0,
       coachingStaff: 0,
+      galleryImages: 0, // Added gallery count
     },
     recentInquiries: [],
     recentApplications: [],
     playerStatusDistribution: distribution,
+    recentGallery: [], // Added recent gallery
   };
 }
 
@@ -92,6 +95,16 @@ function mapApplication(row: Record<string, unknown>): AdminApplicationRow {
   };
 }
 
+// Added mapper for gallery items
+function mapGalleryItem(row: Record<string, unknown>): GalleryItem {
+  return {
+    id: row.id as string,
+    title: (row.title as string) || '',
+    imageUrl: (row.image_url as string) || '',
+    category: (row.category as string) || '',
+  };
+}
+
 export async function getAdminDashboard(): Promise<AdminDashboardData> {
   if (!isSupabaseApiConfigured()) return dashboardFromSeed();
 
@@ -107,10 +120,12 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     { count: academyApplications },
     { count: activeScoutInquiries },
     { count: activeContactInquiries },
+    { count: galleryImages }, // Added gallery count fetch
     { data: scoutRows },
     { data: contactRows },
     { data: applicationRows },
     { data: playerRows },
+    { data: galleryRows }, // Added recent gallery fetch
   ] = await Promise.all([
     supabase.from('players').select('*', { count: 'exact', head: true }),
     supabase.from('players').select('*', { count: 'exact', head: true }).eq('status', 'abroad'),
@@ -127,10 +142,12 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
       .from('contact_inquiries')
       .select('*', { count: 'exact', head: true })
       .in('status', ACTIVE_INQUIRY_STATUSES),
+    supabase.from('gallery_items').select('*', { count: 'exact', head: true }), // Added
     supabase.from('scout_inquiries').select('*').order('created_at', { ascending: false }).limit(6),
     supabase.from('contact_inquiries').select('*').order('created_at', { ascending: false }).limit(6),
     supabase.from('academy_applications').select('*').order('created_at', { ascending: false }).limit(6),
     supabase.from('players').select('status'),
+    supabase.from('gallery_items').select('id, title, image_url, category').order('sort_order', { ascending: true }).limit(5), // Added
   ]);
 
   const stats: AdminDashboardStats = {
@@ -142,6 +159,7 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     videos: videos ?? 0,
     upcomingFixtures: upcomingFixtures ?? 0,
     coachingStaff: coachingStaff ?? 0,
+    galleryImages: galleryImages ?? 0, // Added gallery count to stats
   };
 
   const recentInquiries = [...(scoutRows ?? []).map(mapScoutInquiry), ...(contactRows ?? []).map(mapContactInquiry)]
@@ -149,6 +167,8 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     .slice(0, 4);
 
   const recentApplications = (applicationRows ?? []).map(mapApplication);
+  
+  const recentGallery = (galleryRows ?? []).map(mapGalleryItem); // Added
 
   const statusCounts = new Map<PlayerStatus, number>();
   for (const row of playerRows ?? []) {
@@ -162,7 +182,13 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     count: statusCounts.get(status) ?? 0,
   }));
 
-  return { stats, recentInquiries, recentApplications, playerStatusDistribution };
+  return { 
+    stats, 
+    recentInquiries, 
+    recentApplications, 
+    playerStatusDistribution,
+    recentGallery,
+  };
 }
 
 export async function getAdminInquiries() {

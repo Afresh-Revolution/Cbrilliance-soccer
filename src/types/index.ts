@@ -255,6 +255,7 @@ export interface AdminDashboardStats {
   videos: number;
   upcomingFixtures: number;
   coachingStaff: number;
+  galleryImages: number;
 }
 
 export interface AdminInquiryRow {
@@ -300,4 +301,8 @@ export interface AdminDashboardData {
   recentInquiries: AdminInquiryRow[];
   recentApplications: AdminApplicationRow[];
   playerStatusDistribution: AdminPlayerStatusRow[];
+  recentGallery: GalleryItem[];
 }
+
+
+

@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type {
   AdminApplicationRow,
   AdminDashboardStats,
   AdminInquiryRow,
   AdminPlayerStatusRow,
+  GalleryItem,
 } from '@/types';
 import { formatDate } from '@/lib/utils/format';
 
@@ -17,6 +19,7 @@ function StatIcon({ type }: { type: string }) {
     videos: 'M4 6h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Zm2 2v8h8l4-4V8l-4-4H6Z',
     fixtures: 'M6 4h12v2H6V4Zm-2 4h16v12H4V8Zm2 2v8h12v-8H6Zm2 2h3v2H8v-2Zm5 0h3v2h-3v-2Z',
     staff: 'M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.3L12 14.8 7.2 16.8l.9-5.3L4.2 7.7l5.4-.8L12 2Z',
+    gallery: 'M4 4h16v16H4V4Zm2 2v12h12V6H6Zm1 1h4v4H7V7Zm6 0h4v4h-4V7ZM7 12h4v4H7v-4Zm6 0h4v4h-4v-4Z',
   };
 
   return (
@@ -35,6 +38,7 @@ const STAT_ITEMS: { key: keyof AdminDashboardStats; label: string; icon: string 
   { key: 'videos', label: 'Videos', icon: 'videos' },
   { key: 'upcomingFixtures', label: 'Upcoming Fixtures', icon: 'fixtures' },
   { key: 'coachingStaff', label: 'Coaching Staff', icon: 'staff' },
+  { key: 'galleryImages', label: 'Gallery Images', icon: 'gallery' },
 ];
 
 function statusBadgeClass(status: string): string {
@@ -158,6 +162,41 @@ export function AdminApplicationsPanel({ items }: { items: AdminApplicationRow[]
   );
 }
 
+export function AdminGalleryPanel({ items }: { items: GalleryItem[] }) {
+  return (
+    <FeedList
+      title="Recent Gallery Images"
+      href="/admin/gallery"
+      emptyMessage="No gallery images yet."
+      items={items}
+      itemKey={(item) => item.id}
+      renderItem={(item) => (
+        <div className="admin-dash__feed-item admin-dash__feed-item--gallery">
+          <div className="admin-dash__gallery-thumb" aria-hidden>
+            {item.imageUrl ? (
+              <Image
+                src={item.imageUrl}
+                alt={item.title}
+                fill
+                sizes="48px"
+                style={{ objectFit: 'cover' }}
+              />
+            ) : (
+              <StatIcon type="gallery" />
+            )}
+          </div>
+          <div className="admin-dash__feed-body">
+            <p className="admin-dash__feed-name">{item.title}</p>
+            <p className="admin-dash__feed-meta">
+              {item.category || 'Uncategorized'}
+            </p>
+          </div>
+        </div>
+      )}
+    />
+  );
+}
+
 export function AdminStatusDistribution({ rows }: { rows: AdminPlayerStatusRow[] }) {
   const max = Math.max(...rows.map((r) => r.count), 1);
 
@@ -187,6 +226,7 @@ const QUICK_ACTIONS = [
   { label: 'Add Fixture', href: '/club', icon: 'fixtures' },
   { label: 'Publish News', href: '/admin/news', icon: 'news' },
   { label: 'Add Video', href: '/admin/videos', icon: 'videos' },
+  { label: 'Upload Image', href: '/admin/gallery/new', icon: 'gallery' },
   { label: 'Review Applications', href: '/admin/applications', icon: 'applications' },
   { label: 'Manage Staff', href: '/admin/staff', icon: 'staff' },
 ];
