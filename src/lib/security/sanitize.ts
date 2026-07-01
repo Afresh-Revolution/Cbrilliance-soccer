@@ -68,4 +68,30 @@ export function detectImageMimeFromBytes(buffer: ArrayBuffer): string | null {
   return null;
 }
 
+/** Magic-byte sniffing for video and PDF uploads. */
+export function detectUploadMimeFromBytes(buffer: ArrayBuffer, declaredMime: string): string | null {
+  const image = detectImageMimeFromBytes(buffer);
+  if (image) return image;
+
+  const bytes = new Uint8Array(buffer.slice(0, 12));
+  const ascii = String.fromCharCode(...bytes);
+
+  if (declaredMime === 'application/pdf' && ascii.startsWith('%PDF-')) {
+    return 'application/pdf';
+  }
+
+  if (declaredMime === 'video/mp4') {
+    const box = ascii.slice(4, 8);
+    if (box === 'ftyp' || box === 'moov' || box === 'mdat') {
+      return 'video/mp4';
+    }
+  }
+
+  if (declaredMime === 'video/webm' && bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3) {
+    return 'video/webm';
+  }
+
+  return null;
+}
+
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

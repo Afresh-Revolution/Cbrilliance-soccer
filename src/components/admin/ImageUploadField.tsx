@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useRef, useState } from 'react';
-import Image from 'next/image';
+import MediaImage from '@/components/common/MediaImage';
 import { uploadMediaFile } from '@/lib/storage/upload-client';
 
 interface Props {
@@ -67,7 +67,7 @@ export default function ImageUploadField({ label, value, onChange, folder = 'med
       {value ? (
         <div className="image-upload__preview">
           <div className="image-upload__preview-img">
-            <Image src={value} alt="" fill sizes="160px" />
+            <MediaImage src={value} alt="" fill sizes="160px" fallbackSrc="" />
           </div>
           <div className="image-upload__preview-actions">
             <button

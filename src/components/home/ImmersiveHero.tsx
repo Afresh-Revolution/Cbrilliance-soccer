@@ -54,7 +54,7 @@ export default function ImmersiveHero({ players, stats }: Props) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="label">Community Based Football Club</p>
+          <p className="label">The Innovational Football Club</p>
           <h1 className="immersive-hero__title">
             From Talent To <TypewriterText />
           </h1>

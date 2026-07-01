@@ -38,8 +38,8 @@ export default function Header() {
               <Image
                 src={CBFC_MEDIA.logo}
                 alt="CBFC"
-                width={120}
-                height={40}
+                width={48}
+                height={48}
                 className="header__logo-img"
                 priority
               />

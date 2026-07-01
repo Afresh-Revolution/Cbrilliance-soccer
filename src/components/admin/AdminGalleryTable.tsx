@@ -1,20 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { GalleryRecord } from '@/lib/data/gallery-admin';
+import AdminGalleryModal from '@/components/admin/AdminGalleryModal';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
+import MediaImage from '@/components/common/MediaImage';
+import type { GalleryRecord } from '@/lib/data/gallery-shared';
 import { fetchCsrfToken, deleteWithCsrf } from '@/lib/auth/csrf-client';
+
+type ModalState =
+  | { mode: 'create' }
+  | { mode: 'edit'; item: GalleryRecord }
+  | null;
 
 export default function AdminGalleryTable({ gallery: initialGallery }: { gallery: GalleryRecord[] }) {
   const router = useRouter();
   const [gallery, setGallery] = useState(initialGallery);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [modal, setModal] = useState<ModalState>(null);
+  const [deleteTarget, setDeleteTarget] = useState<GalleryRecord | null>(null);
 
-  async function handleDelete(item: GalleryRecord) {
-    if (!confirm(`Delete "${item.title}" from the club gallery? This cannot be undone.`)) return;
+  function handleSaved(record: GalleryRecord) {
+    setGallery((prev) => {
+      const index = prev.findIndex((entry) => entry.id === record.id);
+      if (index === -1) {
+        return [...prev, record].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      }
+      const next = [...prev];
+      next[index] = record;
+      return next.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    });
+    setModal(null);
+    router.refresh();
+  }
 
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+
+    const item = deleteTarget;
     setBusyId(item.id);
     try {
       const csrf = await fetchCsrfToken();
@@ -24,6 +47,10 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
         return;
       }
       setGallery((prev) => prev.filter((entry) => entry.id !== item.id));
+      if (modal?.mode === 'edit' && modal.item.id === item.id) {
+        setModal(null);
+      }
+      setDeleteTarget(null);
       router.refresh();
     } catch {
       alert('Failed to delete gallery image');
@@ -36,9 +63,13 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
     <>
       <div className="admin-staff__toolbar">
         <p>{gallery.length} gallery image{gallery.length === 1 ? '' : 's'}</p>
-        <Link href="/admin/gallery/new" className="btn btn--primary btn--sm">
+        <button
+          type="button"
+          className="btn btn--primary btn--sm"
+          onClick={() => setModal({ mode: 'create' })}
+        >
           + Add Image
-        </Link>
+        </button>
       </div>
 
       <div className="admin__table-wrap">
@@ -64,11 +95,18 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
                 <tr key={item.id}>
                   <td>
                     {item.imageUrl ? (
-                      <div style={{ width: 92, height: 56, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
-                        <Image src={item.imageUrl} alt={item.title} fill sizes="92px" style={{ objectFit: 'cover' }} />
+                      <div className="admin-gallery__thumb">
+                        <MediaImage
+                          src={item.imageUrl}
+                          alt={item.title}
+                          fill
+                          sizes="92px"
+                          style={{ objectFit: 'cover' }}
+                          fallbackSrc=""
+                        />
                       </div>
                     ) : (
-                      <div style={{ width: 92, height: 56, borderRadius: 8, background: 'rgba(255,255,255,0.08)' }} />
+                      <div className="admin-gallery__thumb admin-gallery__thumb--empty" />
                     )}
                   </td>
                   <td>{item.title}</td>
@@ -76,14 +114,18 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
                   <td>{item.sortOrder ?? 0}</td>
                   <td>
                     <div className="admin-videos__actions">
-                      <Link href={`/admin/gallery/${item.id}/edit`} className="btn btn--outline btn--sm">
+                      <button
+                        type="button"
+                        className="btn btn--outline btn--sm"
+                        onClick={() => setModal({ mode: 'edit', item })}
+                      >
                         Edit
-                      </Link>
+                      </button>
                       <button
                         type="button"
                         className="btn btn--outline btn--sm admin-videos__delete"
                         disabled={busyId === item.id}
-                        onClick={() => handleDelete(item)}
+                        onClick={() => setDeleteTarget(item)}
                       >
                         Delete
                       </button>
@@ -95,6 +137,26 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
           </tbody>
         </table>
       </div>
+
+      {modal && (
+        <AdminGalleryModal
+          mode={modal.mode}
+          item={modal.mode === 'edit' ? modal.item : null}
+          onClose={() => setModal(null)}
+          onSaved={handleSaved}
+        />
+      )}
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete gallery image?"
+          message={`"${deleteTarget.title}" will be removed from the club gallery. This cannot be undone.`}
+          confirmLabel="Delete image"
+          busy={busyId === deleteTarget.id}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
     </>
   );
 }

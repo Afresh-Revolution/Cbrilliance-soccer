@@ -82,6 +82,43 @@ function httpsRequest(
   });
 }
 
+function httpsRequestBinary(
+  targetUrl: string,
+  method: 'GET' | 'HEAD',
+  headers: Record<string, string>,
+): Promise<{ statusCode: number; body: Buffer; contentType: string }> {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(targetUrl);
+
+    const request = https.request(
+      {
+        hostname: parsed.hostname,
+        port: parsed.port || 443,
+        path: `${parsed.pathname}${parsed.search}`,
+        method,
+        headers,
+        family: 4,
+      },
+      (response) => {
+        const chunks: Buffer[] = [];
+        response.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+        response.on('end', () => {
+          resolve({
+            statusCode: response.statusCode ?? 0,
+            body: Buffer.concat(chunks),
+            contentType: response.headers['content-type']?.toString() || 'application/octet-stream',
+          });
+        });
+      },
+    );
+
+    request.on('error', reject);
+    request.setTimeout(120_000, () => request.destroy(new Error(`B2 request timed out: ${targetUrl}`)));
+
+    request.end();
+  });
+}
+
 async function withRetry<T>(label: string, fn: () => Promise<T>, attempts = 3): Promise<T> {
   let lastError: unknown;
 
@@ -222,25 +259,24 @@ export async function deleteFileNative(key: string, fileId?: string): Promise<vo
   await b2ApiPost(auth, '/b2api/v2/b2_delete_file_version', { fileId, fileName: key });
 }
 
-export type B2ClientUpload = {
-  uploadUrl: string;
-  authorizationToken: string;
-  key: string;
-  contentType: string;
-};
-
-export async function createNativeUpload(key: string, contentType: string): Promise<B2ClientUpload> {
+export async function downloadFileNative(
+  key: string,
+): Promise<{ buffer: Buffer; contentType: string }> {
   const { bucket } = getCredentials();
   const auth = await authorizeAccount();
-  const bucketId = await getBucketId(auth, bucket);
-  const upload = await getNativeUploadUrl(auth, bucketId);
+  const url = `${auth.downloadUrl.replace(/\/$/, '')}/file/${bucket}/${b2FileName(key)}`;
 
-  return {
-    uploadUrl: upload.uploadUrl,
-    authorizationToken: upload.authorizationToken,
-    key,
-    contentType,
-  };
+  const result = await withRetry(`B2 download ${key}`, () =>
+    httpsRequestBinary(url, 'GET', {
+      Authorization: auth.authorizationToken,
+    }),
+  );
+
+  if (result.statusCode < 200 || result.statusCode >= 300) {
+    throw new Error(`B2 download failed (${result.statusCode})`);
+  }
+
+  return { buffer: result.body, contentType: result.contentType };
 }
 
 export async function remoteFileExists(publicUrl: string): Promise<boolean> {

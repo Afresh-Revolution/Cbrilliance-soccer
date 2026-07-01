@@ -5,9 +5,10 @@ import type {
   AdminDashboardStats,
   AdminInquiryRow,
   AdminPlayerStatusRow,
+  AdminRecentPlayer,
   GalleryItem,
 } from '@/types';
-import { formatDate } from '@/lib/utils/format';
+import { resolveMediaUrl } from '@/lib/data/cbfc-media';
 
 function StatIcon({ type }: { type: string }) {
   const paths: Record<string, string> = {
@@ -175,7 +176,7 @@ export function AdminGalleryPanel({ items }: { items: GalleryItem[] }) {
           <div className="admin-dash__gallery-thumb" aria-hidden>
             {item.imageUrl ? (
               <Image
-                src={item.imageUrl}
+                src={resolveMediaUrl(item.imageUrl)}
                 alt={item.title}
                 fill
                 sizes="48px"
@@ -222,13 +223,12 @@ export function AdminStatusDistribution({ rows }: { rows: AdminPlayerStatusRow[]
 }
 
 const QUICK_ACTIONS = [
-  { label: 'Add Player', href: '/admin/players', icon: 'players' },
-  { label: 'Add Fixture', href: '/club', icon: 'fixtures' },
-  { label: 'Publish News', href: '/admin/news', icon: 'news' },
-  { label: 'Add Video', href: '/admin/videos', icon: 'videos' },
-  { label: 'Upload Image', href: '/admin/gallery/new', icon: 'gallery' },
+  { label: 'Add Player', href: '/admin/players/new', icon: 'players' },
+  { label: 'Publish News', href: '/admin/news/new', icon: 'news' },
+  { label: 'Add Video', href: '/admin/videos/new', icon: 'videos' },
+  { label: 'Upload Image', href: '/admin/gallery', icon: 'gallery' },
   { label: 'Review Applications', href: '/admin/applications', icon: 'applications' },
-  { label: 'Manage Staff', href: '/admin/staff', icon: 'staff' },
+  { label: 'Manage Staff', href: '/admin/staff/new', icon: 'staff' },
 ];
 
 export function AdminQuickActions() {
@@ -247,37 +247,35 @@ export function AdminQuickActions() {
   );
 }
 
-export function AdminRecentPlayersTable({
-  players,
-}: {
-  players: { id: string; fullName: string; position: string; status: string; nationality: string }[];
-}) {
-  if (players.length === 0) return null;
-
+export function AdminRecentPlayersTable({ players }: { players: AdminRecentPlayer[] }) {
   return (
     <>
       <h2 className="admin-dash__section-title">Recent Players</h2>
       <div className="admin__table-wrap">
-        <table className="admin__table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Position</th>
-              <th>Status</th>
-              <th>Nationality</th>
-            </tr>
-          </thead>
-          <tbody>
-            {players.slice(0, 5).map((p) => (
-              <tr key={p.id}>
-                <td>{p.fullName}</td>
-                <td style={{ textTransform: 'capitalize' }}>{p.position}</td>
-                <td style={{ textTransform: 'capitalize' }}>{p.status.replace(/_/g, ' ')}</td>
-                <td>{p.nationality}</td>
+        {players.length === 0 ? (
+          <p className="admin-dash__empty">No players yet.</p>
+        ) : (
+          <table className="admin__table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Nationality</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {players.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.fullName}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{p.position}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{p.status.replace(/_/g, ' ')}</td>
+                  <td>{p.nationality}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </>
   );

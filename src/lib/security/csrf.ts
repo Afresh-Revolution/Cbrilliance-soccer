@@ -14,7 +14,7 @@ export async function setCsrfCookie(response: NextResponse, token?: string): Pro
   response.cookies.set(CSRF_COOKIE, value, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
     path: '/',
     maxAge: 60 * 60 * 8,
   });

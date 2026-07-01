@@ -24,7 +24,7 @@ export function getAdminNotificationEmail(): string {
 export function getLogoUrl(): string {
   const b2 = process.env.NEXT_PUBLIC_B2_PUBLIC_URL?.replace(/\/$/, '');
   if (b2 && process.env.NEXT_PUBLIC_USE_B2_MEDIA === 'true') {
-    return `${b2}/cbfc/logo/cbfc-logo.jpg`;
+    return `${b2}/cbfc/logo/cbfc-logo.png`;
   }
-  return `${getSiteUrl()}/media/CBFC%20Logo.jpg`;
+  return `${getSiteUrl()}/media/CBFC%20Logo.png`;
 }

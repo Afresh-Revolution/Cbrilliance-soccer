@@ -1,17 +1,16 @@
-import type { GalleryItem } from '@/types';
+import type { AdminGalleryInput, GalleryRecord } from './gallery-shared';
 import { isSupabaseApiConfigured } from '@/lib/db/env';
-import type { z } from 'zod';
-import type { adminGallerySchema } from '@/lib/validators/schemas';
 import { seedGallery } from './seed';
+import { canonicalMediaStorageUrl } from './cbfc-media';
 
-export type AdminGalleryInput = z.infer<typeof adminGallerySchema>;
-export type GalleryRecord = GalleryItem & { sortOrder?: number };
+export type { AdminGalleryInput, GalleryRecord } from './gallery-shared';
+export { galleryToFormValues } from './gallery-shared';
 
 function mapDbGallery(row: Record<string, unknown>): GalleryRecord {
   return {
     id: row.id as string,
     title: (row.title as string) || '',
-    imageUrl: row.image_url as string,
+    imageUrl: (row.image_url as string) || '',
     category: (row.category as string) || '',
     sortOrder: (row.sort_order as number) ?? 0,
   };
@@ -20,10 +19,14 @@ function mapDbGallery(row: Record<string, unknown>): GalleryRecord {
 function toDbRow(input: AdminGalleryInput) {
   return {
     title: input.title.trim(),
-    image_url: input.imageUrl.trim(),
+    image_url: canonicalMediaStorageUrl(input.imageUrl),
     category: input.category?.trim() || null,
     sort_order: input.sortOrder ?? 0,
   };
+}
+
+function seedWithSortOrder(): GalleryRecord[] {
+  return seedGallery.map((item, index) => ({ ...item, sortOrder: index }));
 }
 
 async function getServiceSupabase() {
@@ -32,9 +35,7 @@ async function getServiceSupabase() {
 }
 
 export async function getAllGallery(): Promise<GalleryRecord[]> {
-  if (!isSupabaseApiConfigured()) {
-    return seedGallery.map((item, index) => ({ ...item, sortOrder: index }));
-  }
+  if (!isSupabaseApiConfigured()) return seedWithSortOrder();
 
   const supabase = await getServiceSupabase();
   const { data, error } = await supabase
@@ -42,16 +43,14 @@ export async function getAllGallery(): Promise<GalleryRecord[]> {
     .select('*')
     .order('sort_order', { ascending: true });
 
-  if (error || !data) {
-    return seedGallery.map((item, index) => ({ ...item, sortOrder: index }));
-  }
-
+  if (error || !data) return seedWithSortOrder();
   return data.map(mapDbGallery);
 }
 
 export async function getGalleryById(id: string): Promise<GalleryRecord | null> {
   if (!isSupabaseApiConfigured()) {
-    return seedGallery.find((item) => item.id === id) ? { ...seedGallery.find((item) => item.id === id)!, sortOrder: 0 } : null;
+    const item = seedGallery.find((entry) => entry.id === id);
+    return item ? { ...item, sortOrder: 0 } : null;
   }
 
   const supabase = await getServiceSupabase();
@@ -91,7 +90,7 @@ export async function updateGallery(id: string, input: Partial<AdminGalleryInput
 
   const patch: Record<string, unknown> = {};
   if (input.title !== undefined) patch.title = input.title.trim();
-  if (input.imageUrl !== undefined) patch.image_url = input.imageUrl.trim();
+  if (input.imageUrl !== undefined) patch.image_url = canonicalMediaStorageUrl(input.imageUrl);
   if (input.category !== undefined) patch.category = input.category.trim() || null;
   if (input.sortOrder !== undefined) patch.sort_order = input.sortOrder;
 
@@ -109,13 +108,4 @@ export async function deleteGallery(id: string): Promise<void> {
   const supabase = await getServiceSupabase();
   const { error } = await supabase.from('gallery_items').delete().eq('id', id);
   if (error) throw new Error(error.message);
-}
-
-export function galleryToFormValues(item: GalleryRecord): AdminGalleryInput {
-  return {
-    title: item.title,
-    imageUrl: item.imageUrl,
-    category: item.category ?? '',
-    sortOrder: item.sortOrder ?? 0,
-  };
 }

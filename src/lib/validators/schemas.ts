@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  optionalSafeMediaUrlSchema,
+  safeMediaUrlSchema,
+  safeVideoUrlSchema,
+} from '@/lib/validators/media-urls';
 
 export const academyApplicationSchema = z.object({
   fullName: z.string().min(2, 'Name is required'),
@@ -66,13 +71,6 @@ export const updateCredentialsSchema = z.object({
   message: 'Provide a new email or new password',
 });
 
-export const uploadRequestSchema = z.object({
-  filename: z.string().min(1).max(255),
-  contentType: z.string().min(3).max(100),
-  folder: z.string().max(40).optional(),
-  fileSize: z.number().int().positive().max(10 * 1024 * 1024).optional(),
-});
-
 export const playersQuerySchema = z.object({
   search: z.string().max(100).optional(),
   position: z.enum(['goalkeeper', 'defender', 'midfielder', 'forward']).optional(),
@@ -100,7 +98,7 @@ export const adminPlayerStatisticsSchema = z.object({
 export const adminPlayerSchema = z.object({
   fullName: z.string().min(2).max(120),
   slug: z.string().min(2).max(120).optional(),
-  profilePhoto: z.string().max(2048).optional(),
+  profilePhoto: optionalSafeMediaUrlSchema,
   dateOfBirth: z.string().min(1),
   nationality: z.string().min(2).max(80),
   position: z.enum(['goalkeeper', 'defender', 'midfielder', 'forward']),
@@ -150,7 +148,7 @@ export const adminNewsArticleSchema = z.object({
   excerpt: z.string().max(500).optional(),
   content: z.string().max(50000).optional(),
   category: newsCategoryEnum,
-  coverImage: z.string().max(2048).optional(),
+  coverImage: optionalSafeMediaUrlSchema,
   author: z.string().max(120).optional(),
   published: z.boolean().optional(),
   featured: z.boolean().optional(),
@@ -163,8 +161,8 @@ const videoPositionEnum = z.enum(['goalkeeper', 'defender', 'midfielder', 'forwa
 
 export const adminVideoSchema = z.object({
   title: z.string().min(2).max(200),
-  thumbnail: z.string().max(2048).optional(),
-  videoUrl: z.string().min(5).max(2048),
+  thumbnail: optionalSafeMediaUrlSchema,
+  videoUrl: safeVideoUrlSchema,
   playerId: z.string().uuid().nullable().optional(),
   playerName: z.string().max(120).optional(),
   position: videoPositionEnum.optional(),
@@ -198,7 +196,7 @@ export const adminInquiryStatusSchema = z.object({
 export const adminStaffSchema = z.object({
   name: z.string().min(2).max(120),
   role: z.string().min(2).max(120),
-  photo: z.string().max(2048).optional(),
+  photo: optionalSafeMediaUrlSchema,
   bio: z.string().max(500).optional(),
   sortOrder: z.coerce.number().int().min(0).optional(),
 });
@@ -207,9 +205,14 @@ export const adminStaffPatchSchema = adminStaffSchema.partial();
 
 export const adminGallerySchema = z.object({
   title: z.string().min(1, 'Title is required').max(120),
-  imageUrl: z.string().min(1, 'Image is required').max(2048),
+  imageUrl: safeMediaUrlSchema,
   category: z.string().max(50).optional(),
   sortOrder: z.coerce.number().int().min(0).optional(),
 });
 
 export const adminGalleryPatchSchema = adminGallerySchema.partial();
+
+export const auditLogsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  offset: z.coerce.number().int().min(0).max(10_000).default(0),
+});

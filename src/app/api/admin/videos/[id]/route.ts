@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
-import { guardAuthPost, guardAuthGet, handleAuthError, rejectInvalidUuid } from '@/lib/security/api-guard';
-import { validateCsrf } from '@/lib/security/csrf';
+import { guardAuthMutation, guardAuthGet, handleAuthError, rejectInvalidUuid } from '@/lib/security/api-guard';
 import { writeAuditLog } from '@/lib/security/audit';
 import { adminVideoPatchSchema } from '@/lib/validators/schemas';
 import { deleteVideo, getVideoById, updateVideo } from '@/lib/data/video-admin';
@@ -32,12 +31,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
-  const blocked = guardAuthPost(request, 'admin-videos-update', 60, 60 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'admin-videos-update', 60, 60 * 60 * 1000);
   if (blocked) return blocked;
 
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-  }
+
 
   try {
     const ctx = await requireAuthContext();
@@ -70,12 +67,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 }
 
 export async function DELETE(request: NextRequest, context: RouteContext) {
-  const blocked = guardAuthPost(request, 'admin-videos-delete', 30, 60 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'admin-videos-delete', 30, 60 * 60 * 1000);
   if (blocked) return blocked;
 
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-  }
+
 
   try {
     const ctx = await requireAuthContext();

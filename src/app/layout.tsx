@@ -14,9 +14,11 @@ const dmSans = DM_Sans({
   weight: ['400', '500', '600', '700'],
 });
 
-const CBFC_LOGO = '/media/CBFC%20Logo.jpg';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const CBFC_LOGO = '/media/CBFC Logo.png';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'CBFC | The Innovational Football Club',
     template: '%s | CBFC',
@@ -24,7 +26,7 @@ export const metadata: Metadata = {
   description:
     'CBFC develops, represents, and advances football talent through our Academy, Agency, and Professional Club structure.',
   icons: {
-    icon: [{ url: CBFC_LOGO, type: 'image/jpeg' }],
+    icon: [{ url: CBFC_LOGO, type: 'image/png' }],
     apple: CBFC_LOGO,
     shortcut: CBFC_LOGO,
   },

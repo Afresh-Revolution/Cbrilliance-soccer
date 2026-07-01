@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { GalleryRecord } from '@/lib/data/gallery-admin';
-import type { AdminGalleryInput } from '@/lib/data/gallery-admin';
+import type { GalleryRecord, AdminGalleryInput } from '@/lib/data/gallery-shared';
 import { fetchCsrfToken, patchWithCsrf, postWithCsrf } from '@/lib/auth/csrf-client';
 import ImageUploadField from '@/components/admin/ImageUploadField';
 
@@ -18,17 +17,35 @@ interface Props {
   mode: 'create' | 'edit';
   initial?: AdminGalleryInput;
   galleryId?: string;
+  inModal?: boolean;
+  onCancel?: () => void;
+  onSuccess?: (gallery: GalleryRecord) => void;
 }
 
-export default function GalleryForm({ mode, initial, galleryId }: Props) {
+export default function GalleryForm({
+  mode,
+  initial,
+  galleryId,
+  inModal = false,
+  onCancel,
+  onSuccess,
+}: Props) {
   const router = useRouter();
   const [form, setForm] = useState<AdminGalleryInput>(initial ?? emptyForm);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   function updateField<K extends keyof AdminGalleryInput>(key: K, value: AdminGalleryInput[K]) {
-  setForm((prev: AdminGalleryInput) => ({ ...prev, [key]: value }));
-}
+    setForm((prev: AdminGalleryInput) => ({ ...prev, [key]: value }));
+  }
+
+  function handleCancel() {
+    if (onCancel) {
+      onCancel();
+      return;
+    }
+    router.back();
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,8 +61,12 @@ export default function GalleryForm({ mode, initial, galleryId }: Props) {
           form,
           csrf,
         );
-        if (!ok) {
+        if (!ok || !data.gallery) {
           setError(typeof data.error === 'string' ? data.error : 'Failed to add gallery image');
+          return;
+        }
+        if (onSuccess) {
+          onSuccess(data.gallery);
           return;
         }
         router.push('/admin/gallery');
@@ -58,8 +79,12 @@ export default function GalleryForm({ mode, initial, galleryId }: Props) {
         form,
         csrf,
       );
-      if (!ok) {
+      if (!ok || !data.gallery) {
         setError(typeof data.error === 'string' ? data.error : 'Failed to update gallery image');
+        return;
+      }
+      if (onSuccess) {
+        onSuccess(data.gallery);
         return;
       }
       router.push('/admin/gallery');
@@ -72,7 +97,10 @@ export default function GalleryForm({ mode, initial, galleryId }: Props) {
   }
 
   return (
-    <form className="admin-player-form" onSubmit={handleSubmit}>
+    <form
+      className={`admin-player-form${inModal ? ' admin-player-form--modal' : ''}`}
+      onSubmit={handleSubmit}
+    >
       {error && <div className="admin-player-form__error">{error}</div>}
 
       <div className="admin-player-form__grid">
@@ -123,7 +151,7 @@ export default function GalleryForm({ mode, initial, galleryId }: Props) {
       </div>
 
       <div className="admin-player-form__actions">
-        <button type="button" className="btn btn--outline" onClick={() => router.back()} disabled={loading}>
+        <button type="button" className="btn btn--outline" onClick={handleCancel} disabled={loading}>
           Cancel
         </button>
         <button type="submit" className="btn btn--primary" disabled={loading}>

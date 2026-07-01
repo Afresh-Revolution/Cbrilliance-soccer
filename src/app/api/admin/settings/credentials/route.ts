@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/db/supabase/server';
 import { updateCredentialsSchema } from '@/lib/validators/schemas';
-import { guardAuthPost, handleAuthError } from '@/lib/security/api-guard';
-import { validateCsrf } from '@/lib/security/csrf';
+import { guardAuthMutation, handleAuthError } from '@/lib/security/api-guard';
 import { writeAuditLog } from '@/lib/security/audit';
 import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
 
 export async function POST(request: NextRequest) {
-  const blocked = guardAuthPost(request, 'admin-credentials', 3, 60 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'admin-credentials', 3, 60 * 60 * 1000);
   if (blocked) return blocked;
 
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-  }
+
 
   try {
     const ctx = await requireAuthContext();

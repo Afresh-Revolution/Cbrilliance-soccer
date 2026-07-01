@@ -6,9 +6,8 @@ export const ADMIN_ROLE_SET = new Set<UserRole>(ADMIN_ROLES);
 
 export function roleFromAuthUser(user: {
   app_metadata?: Record<string, unknown>;
-  user_metadata?: Record<string, unknown>;
 }): UserRole | null {
-  const raw = user.app_metadata?.role ?? user.user_metadata?.role;
+  const raw = user.app_metadata?.role;
   if (typeof raw === 'string' && ADMIN_ROLE_SET.has(raw as UserRole)) {
     return raw as UserRole;
   }

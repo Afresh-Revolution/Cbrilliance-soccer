@@ -7,7 +7,7 @@ export type AuditAction =
   | 'auth.login_failed'
   | 'auth.logout'
   | 'auth.credentials_updated'
-  | 'upload.presign'
+  | 'upload.direct'
   | 'form.contact'
   | 'form.academy'
   | 'form.scout'
@@ -26,7 +26,10 @@ export type AuditAction =
   | 'inquiry.delete'
   | 'staff.create'
   | 'staff.update'
-  | 'staff.delete';
+  | 'staff.delete'
+  | 'gallery.create'
+  | 'gallery.update'
+  | 'gallery.delete';
 
 interface AuditParams {
   action: AuditAction;

@@ -182,7 +182,9 @@ CREATE TABLE IF NOT EXISTS gallery_items (
   title TEXT,
   image_url TEXT NOT NULL,
   category TEXT,
-  sort_order INTEGER DEFAULT 0
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS activity_items (
@@ -284,6 +286,10 @@ DROP POLICY IF EXISTS "Admin full access club staff" ON club_staff;
 CREATE POLICY "Admin full access club staff" ON club_staff FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
 );
+DROP POLICY IF EXISTS "Admin full access gallery" ON gallery_items;
+CREATE POLICY "Admin full access gallery" ON gallery_items FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
+);
 
 -- Admin applications + inquiries (all admin roles)
 DROP POLICY IF EXISTS "Admin read applications" ON academy_applications;
@@ -358,6 +364,8 @@ CREATE INDEX IF NOT EXISTS idx_news_published ON news_articles(published);
 CREATE INDEX IF NOT EXISTS idx_videos_featured ON videos(featured);
 CREATE INDEX IF NOT EXISTS idx_videos_created_at ON videos(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_club_staff_sort_order ON club_staff(sort_order);
+CREATE INDEX IF NOT EXISTS idx_gallery_sort_order ON gallery_items(sort_order);
+CREATE INDEX IF NOT EXISTS idx_gallery_category ON gallery_items(category);
 CREATE INDEX IF NOT EXISTS idx_scout_inquiries_status ON scout_inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_scout_inquiries_created ON scout_inquiries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_contact_inquiries_status ON contact_inquiries(status);
@@ -382,6 +390,9 @@ CREATE TRIGGER players_updated_at BEFORE UPDATE ON players
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 DROP TRIGGER IF EXISTS news_updated_at ON news_articles;
 CREATE TRIGGER news_updated_at BEFORE UPDATE ON news_articles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS gallery_updated_at ON gallery_items;
+CREATE TRIGGER gallery_updated_at BEFORE UPDATE ON gallery_items
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()

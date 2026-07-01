@@ -26,6 +26,14 @@ function loginRedirect(request: NextRequest, error?: string) {
   return NextResponse.redirect(redirectUrl);
 }
 
+function nextWithPathname(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+}
+
 async function resolveAdminRole(
   supabase: ReturnType<typeof createServerClient>,
   user: { id: string; app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> },
@@ -53,7 +61,7 @@ export async function middleware(request: NextRequest) {
   const isProtectedApi = isProtectedApiPath(pathname);
 
   if (!isAdminRoute && !isProtectedApi) {
-    return NextResponse.next({ request });
+    return nextWithPathname(request);
   }
 
   const url = getSupabaseApiUrl();
@@ -65,10 +73,10 @@ export async function middleware(request: NextRequest) {
     if (!isLoginRoute) {
       return loginRedirect(request);
     }
-    return NextResponse.next({ request });
+    return nextWithPathname(request);
   }
 
-  let supabaseResponse = NextResponse.next({ request });
+  let supabaseResponse = nextWithPathname(request);
 
   const supabase = createServerClient(url, anonKey, {
     cookies: {
@@ -77,7 +85,7 @@ export async function middleware(request: NextRequest) {
       },
       setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        supabaseResponse = NextResponse.next({ request });
+        supabaseResponse = nextWithPathname(request);
         cookiesToSet.forEach(({ name, value, options }) =>
           supabaseResponse.cookies.set(name, value, options),
         );

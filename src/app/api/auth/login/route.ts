@@ -1,22 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@/lib/db/supabase/server';
 import { loginSchema } from '@/lib/validators/schemas';
-import { guardAuthPost } from '@/lib/security/api-guard';
-import { validateCsrf } from '@/lib/security/csrf';
+import { guardAuthMutation } from '@/lib/security/api-guard';
 import { writeAuditLog } from '@/lib/security/audit';
 import { ensureAdminProfile } from '@/lib/auth/session';
 import { isAdminRole } from '@/lib/auth/rbac';
 
 export async function POST(request: NextRequest) {
-  const blocked = guardAuthPost(request, 'auth-login', 10, 15 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'auth-login', 10, 15 * 60 * 1000);
   if (blocked) return blocked;
-
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json(
-      { error: 'Security token expired. Refresh the page and try again.', code: 'csrf_invalid' },
-      { status: 403 },
-    );
-  }
 
   const response = NextResponse.json({ success: true });
 

@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
-import { guardAuthPost, handleAuthError } from '@/lib/security/api-guard';
-import { validateCsrf } from '@/lib/security/csrf';
+import { guardAuthMutation, handleAuthError } from '@/lib/security/api-guard';
 import { writeAuditLog } from '@/lib/security/audit';
 import { adminPlayerSchema } from '@/lib/validators/schemas';
 import { createPlayer } from '@/lib/data/player-admin';
 
 export async function POST(request: NextRequest) {
-  const blocked = guardAuthPost(request, 'admin-players-create', 30, 60 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'admin-players-create', 30, 60 * 60 * 1000);
   if (blocked) return blocked;
 
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-  }
+
 
   try {
     const ctx = await requireAuthContext();

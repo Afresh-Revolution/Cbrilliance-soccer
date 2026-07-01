@@ -18,7 +18,7 @@ const ROOT = join(import.meta.dir, '..');
 const MEDIA_DIR = join(ROOT, 'assets', 'media');
 
 const UPLOADS: { file: string; key: string; contentType: string }[] = [
-  { file: 'CBFC Logo.jpg', key: CBFC_MEDIA_KEYS.logo, contentType: 'image/jpeg' },
+  { file: 'CBFC Logo.png', key: CBFC_MEDIA_KEYS.logo, contentType: 'image/png' },
   { file: 'Tata-side.png', key: CBFC_MEDIA_KEYS.tata.side, contentType: 'image/png' },
   { file: 'Tata-action.png', key: CBFC_MEDIA_KEYS.tata.action, contentType: 'image/png' },
   { file: 'Tata-action2.png', key: CBFC_MEDIA_KEYS.tata.action2, contentType: 'image/png' },

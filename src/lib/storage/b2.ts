@@ -1,11 +1,7 @@
-import { uploadFileNative, deleteFileNative, createNativeUpload } from '@/lib/storage/b2-native';
+import { uploadFileNative, deleteFileNative, downloadFileNative } from '@/lib/storage/b2-native';
 import { sanitizeFolder } from '@/lib/security/sanitize';
 
 export { getPublicUrl } from '@/lib/storage/b2-native';
-
-export async function getUploadUrl(key: string, contentType: string) {
-  return createNativeUpload(key, contentType);
-}
 
 export async function uploadFile(
   key: string,
@@ -17,6 +13,12 @@ export async function uploadFile(
 
 export async function deleteFile(key: string): Promise<void> {
   await deleteFileNative(key);
+}
+
+export async function downloadFile(
+  key: string,
+): Promise<{ buffer: Buffer; contentType: string }> {
+  return downloadFileNative(key);
 }
 
 export function generateMediaKey(folder: string, filename: string): string {

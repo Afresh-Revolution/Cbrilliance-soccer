@@ -4,7 +4,8 @@ import { formatDate } from '@/lib/utils/format';
 import AnimatedCounter from '@/components/common/AnimatedCounter';
 import FadeIn from '@/components/common/FadeIn';
 import Button from '@/components/common/Button';
-import Image from 'next/image';
+import MediaImage from '@/components/common/MediaImage';
+import GalleryGrid from '@/components/gallery/GalleryGrid';
 
 export const metadata = {
   title: 'Professional Club',
@@ -52,7 +53,12 @@ export default async function ClubPage() {
                     <div className="squad-card__number">#{player.jerseyNumber}</div>
                   )}
                   <div className="squad-card__photo">
-                    <Image src={player.profilePhoto} alt={player.fullName} width={120} height={120} />
+                    <MediaImage
+                      src={player.profilePhoto}
+                      alt={player.fullName}
+                      width={120}
+                      height={120}
+                    />
                   </div>
                   <h4>{player.fullName}</h4>
                   <p className="text-muted">{POSITION_LABELS[player.position]} • {player.nationality}</p>
@@ -158,17 +164,7 @@ export default async function ClubPage() {
       <section className="section section--surface">
         <div className="container">
           <h2 className="text-center mb-lg">Club Gallery</h2>
-          <div className="grid grid--3">
-            {gallery.map((g, i) => (
-              <FadeIn key={g.id} index={i}>
-                <div className="facility-card">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={g.imageUrl} alt={g.title} />
-                  <div className="facility-card__label">{g.title}</div>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
+          <GalleryGrid items={gallery} />
         </div>
       </section>
 

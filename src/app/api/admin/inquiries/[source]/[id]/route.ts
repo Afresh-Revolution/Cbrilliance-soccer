@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
-import { guardAuthPost, guardAuthGet, handleAuthError, rejectInvalidUuid } from '@/lib/security/api-guard';
+import { guardAuthMutation, guardAuthGet, handleAuthError, rejectInvalidUuid } from '@/lib/security/api-guard';
 import { parseInquirySource } from '@/lib/security/params';
-import { validateCsrf } from '@/lib/security/csrf';
 import { writeAuditLog } from '@/lib/security/audit';
 import { adminInquiryStatusSchema } from '@/lib/validators/schemas';
 import { deleteInquiry, getInquiryById, updateInquiryStatus } from '@/lib/data/inquiry-admin';
@@ -39,12 +38,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
-  const blocked = guardAuthPost(request, 'admin-inquiries-update', 60, 60 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'admin-inquiries-update', 60, 60 * 60 * 1000);
   if (blocked) return blocked;
 
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-  }
+
 
   try {
     const ctx = await requireAuthContext();
@@ -99,12 +96,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 }
 
 export async function DELETE(request: NextRequest, context: RouteContext) {
-  const blocked = guardAuthPost(request, 'admin-inquiries-delete', 30, 60 * 60 * 1000);
+  const blocked = await guardAuthMutation(request, 'admin-inquiries-delete', 30, 60 * 60 * 1000);
   if (blocked) return blocked;
 
-  if (!(await validateCsrf(request))) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-  }
+
 
   try {
     const ctx = await requireAuthContext();

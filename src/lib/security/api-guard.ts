@@ -64,6 +64,23 @@ export function guardAuthPost(
   return null;
 }
 
+/** Rate limit + origin + CSRF for authenticated mutations. */
+export async function guardAuthMutation(
+  request: NextRequest,
+  key: string,
+  limit = 5,
+  windowMs = 15 * 60 * 1000,
+): Promise<NextResponse | null> {
+  const blocked = guardAuthPost(request, key, limit, windowMs);
+  if (blocked) return blocked;
+
+  if (!(await validateCsrf(request))) {
+    return jsonError('Invalid security token. Refresh the page and try again.', 403);
+  }
+
+  return null;
+}
+
 export function guardAuthGet(
   request: NextRequest,
   key: string,

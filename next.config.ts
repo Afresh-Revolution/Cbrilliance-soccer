@@ -27,7 +27,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Avoid stale webpack chunks when .next is rebuilt while dev is running (common on OneDrive).
+  serverExternalPackages: ['https', 'crypto'],
   images: {
+    unoptimized: process.env.NODE_ENV === 'development',
     remotePatterns: [
       { protocol: 'https', hostname: '**.backblazeb2.com' },
       { protocol: 'https', hostname: '**.backblaze.com' },
@@ -37,7 +40,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        // Do not attach security headers to Next.js internal assets.
+        source: '/((?!_next/static|_next/image|favicon.ico).*)',
         headers: securityHeaders,
       },
     ];

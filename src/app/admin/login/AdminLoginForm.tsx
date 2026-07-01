@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/components/common/Button';
 import PasswordInput from '@/components/common/PasswordInput';
+import { CBFC_MEDIA } from '@/lib/data/cbfc-media';
 import { fetchCsrfToken, postWithCsrf } from '@/lib/auth/csrf-client';
 
 export default function AdminLoginForm() {
@@ -67,7 +69,18 @@ export default function AdminLoginForm() {
 
       <div className="admin-login__inner">
         <div className="admin-login__brand">
-          <span className="admin-login__logo">CBFC</span>
+          {CBFC_MEDIA.logo ? (
+            <Image
+              src={CBFC_MEDIA.logo}
+              alt="CBFC"
+              width={72}
+              height={72}
+              className="admin-login__logo-img"
+              priority
+            />
+          ) : (
+            <span className="admin-login__logo">CBFC</span>
+          )}
           <span className="admin-login__label">Secure Access</span>
           <h1 className="admin-login__title">Admin Portal</h1>
           <p className="admin-login__subtitle">

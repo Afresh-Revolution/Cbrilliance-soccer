@@ -4,6 +4,7 @@ import type {
   AdminDashboardStats,
   AdminInquiryRow,
   AdminPlayerStatusRow,
+  AdminRecentPlayer,
   ApplicationStatus,
   GalleryItem,
   InquiryStatus,
@@ -13,6 +14,7 @@ import { POSITION_LABELS, STATUS_LABELS } from '@/lib/constants/navigation';
 import { ageGroupFromDateOfBirth } from '@/lib/utils/age-group';
 import { isSupabaseApiConfigured, getSupabaseServiceRoleKey } from '@/lib/db/env';
 import { seedPlayers } from './seed';
+import { resolveMediaUrl } from './cbfc-media';
 
 const ACTIVE_INQUIRY_STATUSES: InquiryStatus[] = ['new', 'pending', 'contacted'];
 
@@ -33,6 +35,16 @@ async function getDbClient() {
   return createClient();
 }
 
+function mapRecentPlayer(row: Record<string, unknown>): AdminRecentPlayer {
+  return {
+    id: row.id as string,
+    fullName: row.full_name as string,
+    position: row.position as string,
+    status: row.status as string,
+    nationality: row.nationality as string,
+  };
+}
+
 function dashboardFromSeed(): AdminDashboardData {
   const distribution = PLAYER_STATUS_BUCKETS.map(({ status, label }) => ({
     status,
@@ -50,12 +62,19 @@ function dashboardFromSeed(): AdminDashboardData {
       videos: 0,
       upcomingFixtures: 0,
       coachingStaff: 0,
-      galleryImages: 0, // Added gallery count
+      galleryImages: 0,
     },
     recentInquiries: [],
     recentApplications: [],
     playerStatusDistribution: distribution,
-    recentGallery: [], // Added recent gallery
+    recentGallery: [],
+    recentPlayers: seedPlayers.slice(0, 5).map((p) => ({
+      id: p.id,
+      fullName: p.fullName,
+      position: p.position,
+      status: p.status,
+      nationality: p.nationality,
+    })),
   };
 }
 
@@ -100,7 +119,7 @@ function mapGalleryItem(row: Record<string, unknown>): GalleryItem {
   return {
     id: row.id as string,
     title: (row.title as string) || '',
-    imageUrl: (row.image_url as string) || '',
+    imageUrl: resolveMediaUrl((row.image_url as string) || ''),
     category: (row.category as string) || '',
   };
 }
@@ -125,7 +144,8 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     { data: contactRows },
     { data: applicationRows },
     { data: playerRows },
-    { data: galleryRows }, // Added recent gallery fetch
+    { data: galleryRows },
+    { data: recentPlayerRows },
   ] = await Promise.all([
     supabase.from('players').select('*', { count: 'exact', head: true }),
     supabase.from('players').select('*', { count: 'exact', head: true }).eq('status', 'abroad'),
@@ -147,7 +167,12 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     supabase.from('contact_inquiries').select('*').order('created_at', { ascending: false }).limit(6),
     supabase.from('academy_applications').select('*').order('created_at', { ascending: false }).limit(6),
     supabase.from('players').select('status'),
-    supabase.from('gallery_items').select('id, title, image_url, category').order('sort_order', { ascending: true }).limit(5), // Added
+    supabase.from('gallery_items').select('id, title, image_url, category').order('sort_order', { ascending: true }).limit(5),
+    supabase
+      .from('players')
+      .select('id, full_name, position, status, nationality')
+      .order('created_at', { ascending: false })
+      .limit(5),
   ]);
 
   const stats: AdminDashboardStats = {
@@ -168,7 +193,8 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
 
   const recentApplications = (applicationRows ?? []).map(mapApplication);
   
-  const recentGallery = (galleryRows ?? []).map(mapGalleryItem); // Added
+  const recentGallery = (galleryRows ?? []).map(mapGalleryItem);
+  const recentPlayers = (recentPlayerRows ?? []).map(mapRecentPlayer);
 
   const statusCounts = new Map<PlayerStatus, number>();
   for (const row of playerRows ?? []) {
@@ -182,12 +208,13 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     count: statusCounts.get(status) ?? 0,
   }));
 
-  return { 
-    stats, 
-    recentInquiries, 
-    recentApplications, 
+  return {
+    stats,
+    recentInquiries,
+    recentApplications,
     playerStatusDistribution,
     recentGallery,
+    recentPlayers,
   };
 }
 

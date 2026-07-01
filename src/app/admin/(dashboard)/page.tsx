@@ -1,5 +1,4 @@
 import { getAdminDashboard } from '@/lib/data/admin-queries';
-import { getPlayers } from '@/lib/data/queries';
 import {
   AdminApplicationsPanel,
   AdminGalleryPanel,
@@ -10,8 +9,10 @@ import {
   AdminStatusDistribution,
 } from '@/components/admin/AdminDashboardPanels';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboardPage() {
-  const [dashboard, players] = await Promise.all([getAdminDashboard(), getPlayers()]);
+  const dashboard = await getAdminDashboard();
 
   return (
     <>
@@ -33,7 +34,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       <AdminQuickActions />
-      <AdminRecentPlayersTable players={players} />
+      <AdminRecentPlayersTable players={dashboard.recentPlayers} />
     </>
   );
 }

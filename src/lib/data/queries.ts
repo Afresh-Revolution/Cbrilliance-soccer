@@ -1,5 +1,6 @@
 import type { Player, NewsArticle, Video, ClubStaff, Fixture, ActivityItem, SiteStats, ClubStats, GalleryItem } from '@/types';
 import { calculateAge } from '@/lib/utils/format';
+import { resolveMediaUrl, resolveMediaUrls } from '@/lib/data/cbfc-media';
 import {
   seedPlayers,
   seedNews,
@@ -69,7 +70,7 @@ function mapDbPlayer(row: Record<string, unknown>): Player {
     id: row.id as string,
     fullName: row.full_name as string,
     slug: row.slug as string,
-    profilePhoto: (row.profile_photo as string) || '',
+    profilePhoto: resolveMediaUrl((row.profile_photo as string) || ''),
     dateOfBirth: dob,
     age: calculateAge(dob),
     nationality: row.nationality as string,
@@ -83,7 +84,7 @@ function mapDbPlayer(row: Record<string, unknown>): Player {
     achievements: (row.achievements as Player['achievements']) || [],
     previousClubs: (row.previous_clubs as Player['previousClubs']) || [],
     videos: (row.videos as string[]) || [],
-    images: (row.images as string[]) || [],
+    images: resolveMediaUrls(row.images as string[]),
     movementHistory: (row.movement_history as Player['movementHistory']) || [],
     status: row.status as Player['status'],
     academyGraduate: row.academy_graduate as boolean,
@@ -172,7 +173,7 @@ export async function getNewsArticles(filters?: {
     excerpt: row.excerpt || '',
     content: row.content || '',
     category: row.category,
-    coverImage: row.cover_image || '',
+    coverImage: resolveMediaUrl(row.cover_image as string),
     author: row.author || 'CBFC Media',
     published: row.published,
     featured: row.featured,
@@ -352,7 +353,7 @@ export async function getGallery(): Promise<GalleryItem[]> {
   return data.map((row) => ({
     id: row.id,
     title: row.title || '',
-    imageUrl: row.image_url,
+    imageUrl: resolveMediaUrl(row.image_url as string),
     category: row.category || '',
   }));
 }

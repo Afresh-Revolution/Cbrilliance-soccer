@@ -18,7 +18,7 @@ export default function AdminLogoutButton() {
   }
 
   return (
-    <button type="button" className="admin__nav-link" onClick={handleLogout} disabled={loading}>
+    <button type="button" className="admin__footer-btn" onClick={handleLogout} disabled={loading}>
       {loading ? 'Signing out...' : 'Sign Out'}
     </button>
   );

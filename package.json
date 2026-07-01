@@ -5,17 +5,15 @@
   "packageManager": "bun@1.2.0",
   "scripts": {
     "dev": "next dev",
+    "dev:reset": "bun run clean && next dev",
     "clean": "bun -e \"try{require('fs').rmSync('.next',{recursive:true,force:true})}catch(e){}\"",
-    "build": "next build",
-    "build:clean": "bun run clean && bun run build",
+    "build": "bun run clean && next build",
     "start": "next start",
     "lint": "next lint",
     "seed-admin": "bun run scripts/seed-admin.ts",
     "upload-cbfc-assets": "bun run scripts/upload-cbfc-assets.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.750.0",
-    "@aws-sdk/s3-request-presigner": "^3.750.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
     "framer-motion": "^12.4.7",

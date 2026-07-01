@@ -296,12 +296,21 @@ export interface AdminPlayerStatusRow {
   count: number;
 }
 
+export interface AdminRecentPlayer {
+  id: string;
+  fullName: string;
+  position: string;
+  status: string;
+  nationality: string;
+}
+
 export interface AdminDashboardData {
   stats: AdminDashboardStats;
   recentInquiries: AdminInquiryRow[];
   recentApplications: AdminApplicationRow[];
   playerStatusDistribution: AdminPlayerStatusRow[];
   recentGallery: GalleryItem[];
+  recentPlayers: AdminRecentPlayer[];
 }
 
 
