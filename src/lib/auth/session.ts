@@ -105,9 +105,24 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   if (!user?.email) return null;
 
   const profile = await getProfile(user.id);
-  if (!profile || !isAdminRole(profile.role)) return null;
+  if (profile && isAdminRole(profile.role)) {
+    return { userId: user.id, email: user.email, profile };
+  }
 
-  return { userId: user.id, email: user.email, profile };
+  const metaRole = roleFromAuthUser(user);
+  if (!metaRole || !isAdminRole(metaRole)) return null;
+
+  return {
+    userId: user.id,
+    email: user.email,
+    profile: {
+      id: user.id,
+      email: user.email,
+      fullName: (user.user_metadata?.full_name as string) || '',
+      role: metaRole,
+      createdAt: new Date().toISOString(),
+    },
+  };
 }
 
 export async function requireAuthContext(): Promise<AuthContext> {
