@@ -212,6 +212,44 @@ export const adminGallerySchema = z.object({
 
 export const adminGalleryPatchSchema = adminGallerySchema.partial();
 
+const activityTypeEnum = z.enum(['trial', 'achievement', 'camp', 'club', 'agency']);
+
+export const adminActivitySchema = z.object({
+  type: activityTypeEnum,
+  title: z.string().min(2).max(200),
+  description: z.string().max(1000).optional(),
+  activityDate: z.string().min(1),
+  playerId: z.string().uuid().nullable().optional(),
+});
+
+export const adminActivityPatchSchema = adminActivitySchema.partial();
+
+export const adminFixtureSchema = z.object({
+  homeTeam: z.string().min(2).max(120),
+  awayTeam: z.string().min(2).max(120),
+  homeScore: z.coerce.number().int().min(0).nullable().optional(),
+  awayScore: z.coerce.number().int().min(0).nullable().optional(),
+  matchDate: z.string().min(1),
+  venue: z.string().max(120).optional(),
+  competition: z.string().max(120).optional(),
+  isUpcoming: z.boolean().optional(),
+});
+
+export const adminFixturePatchSchema = adminFixtureSchema.partial();
+
+export const adminAcademyFacilitySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(120),
+  imageUrl: safeMediaUrlSchema,
+  sortOrder: z.coerce.number().int().min(0).optional(),
+});
+
+export const adminAcademyFacilityPatchSchema = adminAcademyFacilitySchema.partial();
+
+export const adminAcademyFacilitySettingsSchema = z.object({
+  sectionLabel: z.string().min(1).max(80),
+  sectionHeading: z.string().min(1).max(200),
+});
+
 export const auditLogsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).max(10_000).default(0),

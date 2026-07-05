@@ -219,6 +219,24 @@ export interface GalleryItem {
   category: string;
 }
 
+export interface AcademyFacility {
+  id: string;
+  name: string;
+  imageUrl: string;
+  sortOrder: number;
+}
+
+export interface AcademyFacilitiesSection {
+  sectionLabel: string;
+  sectionHeading: string;
+  facilities: AcademyFacility[];
+}
+
+export interface AcademyFacilitySettings {
+  sectionLabel: string;
+  sectionHeading: string;
+}
+
 export interface SiteStats {
   registeredPlayers: number;
   academyGraduates: number;

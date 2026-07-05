@@ -57,7 +57,11 @@ export default function Footer() {
         </div>
 
         <div className="footer__bottom">
-          <p>&copy; {new Date().getFullYear()} CBFC. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()}{' '}
+            <Link href="/admin" className="footer__stealth-link">CBFC</Link>
+            . All rights reserved.
+          </p>
           <div className="footer__social">
             <a href="#" aria-label="Instagram">IG</a>
             <a href="#" aria-label="Twitter">X</a>

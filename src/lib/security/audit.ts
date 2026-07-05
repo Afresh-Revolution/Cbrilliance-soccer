@@ -29,7 +29,17 @@ export type AuditAction =
   | 'staff.delete'
   | 'gallery.create'
   | 'gallery.update'
-  | 'gallery.delete';
+  | 'gallery.delete'
+  | 'fixture.create'
+  | 'fixture.update'
+  | 'fixture.delete'
+  | 'activity.create'
+  | 'activity.update'
+  | 'activity.delete'
+  | 'academy_facility.create'
+  | 'academy_facility.update'
+  | 'academy_facility.delete'
+  | 'academy_facility.settings_update';
 
 interface AuditParams {
   action: AuditAction;

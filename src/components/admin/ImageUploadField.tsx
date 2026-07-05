@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import MediaImage from '@/components/common/MediaImage';
+import FootballUploadProgress from '@/components/admin/FootballUploadProgress';
 import { uploadMediaFile } from '@/lib/storage/upload-client';
 
 interface Props {
@@ -16,6 +17,7 @@ export default function ImageUploadField({ label, value, onChange, folder = 'med
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
 
   async function handleFile(file: File | null) {
@@ -27,15 +29,20 @@ export default function ImageUploadField({ label, value, onChange, folder = 'med
     }
 
     setUploading(true);
+    setProgress(0);
     setError('');
 
     try {
-      const publicUrl = await uploadMediaFile(file, { folder });
+      const publicUrl = await uploadMediaFile(file, {
+        folder,
+        onProgress: setProgress,
+      });
       onChange(publicUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
+      setProgress(0);
       if (inputRef.current) inputRef.current.value = '';
     }
   }
@@ -64,10 +71,17 @@ export default function ImageUploadField({ label, value, onChange, folder = 'med
         disabled={uploading}
       />
 
+      {uploading && (
+        <FootballUploadProgress
+          progress={progress}
+          label={value ? 'Replacing image…' : 'Kicking off upload…'}
+        />
+      )}
+
       {value ? (
-        <div className="image-upload__preview">
+        <div className={`image-upload__preview ${uploading ? 'image-upload__preview--busy' : ''}`}>
           <div className="image-upload__preview-img">
-            <MediaImage src={value} alt="" fill sizes="160px" fallbackSrc="" />
+            <MediaImage src={value} alt="" fill sizes="160px" />
           </div>
           <div className="image-upload__preview-actions">
             <button
@@ -76,7 +90,7 @@ export default function ImageUploadField({ label, value, onChange, folder = 'med
               disabled={uploading}
               onClick={() => inputRef.current?.click()}
             >
-              {uploading ? 'Uploading…' : 'Replace'}
+              Replace
             </button>
             <button
               type="button"
@@ -101,7 +115,7 @@ export default function ImageUploadField({ label, value, onChange, folder = 'med
             </svg>
           </span>
           <span className="image-upload__title">
-            {uploading ? 'Uploading…' : 'Tap to upload'}
+            {uploading ? 'Upload in progress' : 'Tap to upload'}
           </span>
           <span className="image-upload__hint">
             {hint ?? 'JPG, PNG, WebP or GIF · Max 10MB'}

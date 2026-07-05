@@ -1,11 +1,13 @@
 import { notFound } from 'next/navigation';
 import StaffForm from '@/components/admin/StaffForm';
+import { requireAdminUuid } from '@/lib/admin/params';
 import { getStaffById, staffToFormValues } from '@/lib/data/staff-admin';
 
 type Props = { params: Promise<{ id: string }> };
 
 export default async function AdminEditStaffPage({ params }: Props) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = requireAdminUuid(rawId);
   const member = await getStaffById(id);
   if (!member) notFound();
 

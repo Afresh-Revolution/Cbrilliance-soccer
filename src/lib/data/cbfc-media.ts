@@ -26,7 +26,7 @@ const LOCAL_MEDIA: Record<string, string> = {
   [CBFC_MEDIA_KEYS.chocho.back]: '/media/Chocho-back.png',
 };
 
-const MEDIA_KEY_PREFIXES = ['cbfc/', 'gallery/', 'media/'] as const;
+const MEDIA_KEY_PREFIXES = ['cbfc/', 'gallery/', 'media/', 'academy/'] as const;
 
 export function shouldUseB2Media(): boolean {
   const base = process.env.NEXT_PUBLIC_B2_PUBLIC_URL;
@@ -51,6 +51,16 @@ export function extractMediaKey(url: string): string | null {
   if (!trimmed) return null;
   if (LOCAL_MEDIA[trimmed]) return trimmed;
 
+  // Local static assets and proxied paths are handled elsewhere
+  if (trimmed.startsWith('/media/')) return null;
+  if (trimmed.startsWith('/api/media/')) {
+    return trimmed
+      .slice('/api/media/'.length)
+      .split('/')
+      .map((segment) => decodeURIComponent(segment))
+      .join('/');
+  }
+
   const base = process.env.NEXT_PUBLIC_B2_PUBLIC_URL?.replace(/\/$/, '');
   if (base && trimmed.startsWith(`${base}/`)) {
     return trimmed.slice(base.length + 1);
@@ -65,8 +75,7 @@ export function extractMediaKey(url: string): string | null {
   }
 
   for (const prefix of MEDIA_KEY_PREFIXES) {
-    const idx = trimmed.indexOf(prefix);
-    if (idx !== -1) return trimmed.slice(idx);
+    if (trimmed.startsWith(prefix)) return trimmed;
   }
 
   return null;
@@ -80,15 +89,18 @@ export function isRemoteMediaUrl(url: string): boolean {
 export function canonicalMediaStorageUrl(url: string): string {
   const trimmed = url.trim();
   if (!trimmed) return '';
+  if (trimmed.startsWith('/uploads/') || trimmed.startsWith('/media/')) return trimmed;
 
   const base = process.env.NEXT_PUBLIC_B2_PUBLIC_URL?.replace(/\/$/, '');
-  const key = extractMediaKey(trimmed);
-
-  if (key && base) return `${base}/${key}`;
 
   for (const [mediaKey, path] of Object.entries(LOCAL_MEDIA)) {
-    if (trimmed === path && base) return `${base}/${mediaKey}`;
+    if (trimmed === path) {
+      return base ? `${base}/${mediaKey}` : path;
+    }
   }
+
+  const key = extractMediaKey(trimmed);
+  if (key && base) return `${base}/${key}`;
 
   return trimmed;
 }

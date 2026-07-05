@@ -1,11 +1,13 @@
 import { notFound } from 'next/navigation';
 import PlayerForm from '@/components/admin/PlayerForm';
+import { requireAdminUuid } from '@/lib/admin/params';
 import { getPlayerById, playerToFormValues } from '@/lib/data/player-admin';
 
 type Props = { params: Promise<{ id: string }> };
 
 export default async function AdminEditPlayerPage({ params }: Props) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = requireAdminUuid(rawId);
   const player = await getPlayerById(id);
   if (!player) notFound();
 

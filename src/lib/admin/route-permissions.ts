@@ -10,7 +10,16 @@ export function requiredPermissionForAdminPath(pathname: string): string | null 
     return 'inquiries.read';
   }
 
-  const contentRoots = ['/admin/players', '/admin/news', '/admin/videos', '/admin/staff', '/admin/gallery'];
+  const contentRoots = [
+    '/admin/players',
+    '/admin/news',
+    '/admin/videos',
+    '/admin/staff',
+    '/admin/gallery',
+    '/admin/academy-facilities',
+    '/admin/fixtures',
+    '/admin/activity',
+  ];
   if (contentRoots.some((root) => path.startsWith(root))) {
     if (path.endsWith('/new') || /\/[^/]+\/edit$/.test(path)) return 'content.write';
     return 'content.read';

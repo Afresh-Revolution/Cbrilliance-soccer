@@ -1532,6 +1532,103 @@
     font-size: 0.8rem;
     color: #fca5a5;
   }
+
+  &__preview--busy {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+}
+
+.football-upload {
+  margin-bottom: $spacing-md;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: $color-premium-gold;
+  }
+
+  &__percent {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $color-white;
+  }
+
+  &__pitch {
+    position: relative;
+    height: 28px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(#1a472a, 0.95), rgba(#0d2818, 0.98));
+    border: 1px solid rgba($color-premium-gold, 0.25);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  &__line {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid rgba($color-white, 0.12);
+    pointer-events: none;
+
+    &--mid {
+      left: 50%;
+      width: 1px;
+      height: 100%;
+      transform: translate(-50%, -50%);
+    }
+
+    &--box-left,
+    &--box-right {
+      top: 50%;
+      width: 14%;
+      height: 70%;
+      transform: translateY(-50%);
+    }
+
+    &--box-left {
+      left: 0;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+    }
+
+    &--box-right {
+      right: 0;
+      border-right: none;
+      border-radius: 4px 0 0 4px;
+    }
+  }
+
+  &__fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: linear-gradient(
+      90deg,
+      rgba($color-premium-gold, 0.15),
+      rgba($color-premium-gold, 0.45)
+    );
+    transition: width 0.15s ease-out;
+  }
+
+  &__ball {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+    transition: left 0.15s ease-out;
+    z-index: 1;
+  }
 }
 
 .admin-modal {

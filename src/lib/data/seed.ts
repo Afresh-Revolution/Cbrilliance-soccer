@@ -8,6 +8,8 @@ import type {
   SiteStats,
   ClubStats,
   GalleryItem,
+  AcademyFacility,
+  AcademyFacilitiesSection,
 } from '@/types';
 import { calculateAge } from '@/lib/utils/format';
 import { CBFC_MEDIA } from './cbfc-media';
@@ -245,3 +247,25 @@ export const seedGallery: GalleryItem[] = [
   { id: 'g3', title: 'Chocho: In Action', imageUrl: CBFC_MEDIA.chocho.action, category: 'training' },
   { id: 'g4', title: 'Chocho: Tournament', imageUrl: CBFC_MEDIA.chocho.back, category: 'tournament' },
 ];
+
+export const SEED_ACADEMY_FACILITY_IDS = {
+  training: '550e8400-e29b-41d4-a716-446655440001',
+  gym: '550e8400-e29b-41d4-a716-446655440002',
+  classrooms: '550e8400-e29b-41d4-a716-446655440003',
+  medical: '550e8400-e29b-41d4-a716-446655440004',
+  recovery: '550e8400-e29b-41d4-a716-446655440005',
+} as const;
+
+export const seedAcademyFacilities: AcademyFacility[] = [
+  { id: SEED_ACADEMY_FACILITY_IDS.training, name: 'Training Ground', imageUrl: CBFC_MEDIA.tata.action, sortOrder: 0 },
+  { id: SEED_ACADEMY_FACILITY_IDS.gym, name: 'Gym', imageUrl: CBFC_MEDIA.tata.action2, sortOrder: 1 },
+  { id: SEED_ACADEMY_FACILITY_IDS.classrooms, name: 'Classrooms', imageUrl: CBFC_MEDIA.chocho.action, sortOrder: 2 },
+  { id: SEED_ACADEMY_FACILITY_IDS.medical, name: 'Medical Support', imageUrl: CBFC_MEDIA.chocho.back, sortOrder: 3 },
+  { id: SEED_ACADEMY_FACILITY_IDS.recovery, name: 'Recovery Area', imageUrl: CBFC_MEDIA.tata.action, sortOrder: 4 },
+];
+
+export const seedAcademyFacilitiesSection: AcademyFacilitiesSection = {
+  sectionLabel: 'Facilities',
+  sectionHeading: 'World-Class Environment',
+  facilities: seedAcademyFacilities,
+};

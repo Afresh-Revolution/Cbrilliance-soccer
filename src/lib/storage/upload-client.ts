@@ -16,9 +16,14 @@ type UploadResponse = {
   error?: string;
 };
 
+export interface UploadMediaOptions {
+  folder?: string;
+  onProgress?: (percent: number) => void;
+}
+
 export async function uploadMediaFile(
   file: File,
-  options?: { folder?: string },
+  options?: UploadMediaOptions,
 ): Promise<string> {
   if (file.size > MAX_BYTES) {
     throw new Error('File exceeds maximum size of 10MB');
@@ -33,17 +38,43 @@ export async function uploadMediaFile(
   formData.append('file', file);
   formData.append('folder', options?.folder ?? 'media');
 
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    headers: { 'x-csrf-token': csrf },
-    credentials: 'include',
-    body: formData,
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload');
+    xhr.withCredentials = true;
+    xhr.setRequestHeader('x-csrf-token', csrf);
+
+    xhr.upload.addEventListener('progress', (event) => {
+      if (!event.lengthComputable || !options?.onProgress) return;
+      options.onProgress(Math.round((event.loaded / event.total) * 100));
+    });
+
+    xhr.addEventListener('load', () => {
+      let data: UploadResponse = { key: '', publicUrl: '' };
+      try {
+        data = JSON.parse(xhr.responseText) as UploadResponse;
+      } catch {
+        reject(new Error('Upload failed'));
+        return;
+      }
+
+      if (xhr.status < 200 || xhr.status >= 300 || !data.publicUrl) {
+        const message = typeof data.error === 'string'
+          ? data.error
+          : xhr.status >= 500
+            ? 'Server error during upload. Refresh the page and try again.'
+            : 'Upload failed';
+        reject(new Error(message));
+        return;
+      }
+
+      options?.onProgress?.(100);
+      resolve(data.publicUrl);
+    });
+
+    xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+    xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')));
+
+    xhr.send(formData);
   });
-
-  const data = (await response.json()) as UploadResponse;
-  if (!response.ok || !data.publicUrl) {
-    throw new Error(typeof data.error === 'string' ? data.error : 'Upload failed');
-  }
-
-  return data.publicUrl;
 }
