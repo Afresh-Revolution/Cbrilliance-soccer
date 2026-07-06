@@ -1767,6 +1767,18 @@
     margin-bottom: $spacing-xl;
   }
 
+  &__error {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #fca5a5;
+    background: rgba($color-danger, 0.1);
+    border: 1px solid rgba($color-danger, 0.3);
+    border-radius: $radius-sm;
+    padding: $spacing-sm $spacing-md;
+    margin: calc(-1 * #{$spacing-md}) 0 $spacing-lg;
+    text-align: left;
+  }
+
   &__actions {
     display: flex;
     justify-content: center;

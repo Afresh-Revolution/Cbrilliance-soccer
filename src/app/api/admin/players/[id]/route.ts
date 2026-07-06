@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
@@ -60,6 +61,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       request,
     });
 
+    revalidatePath('/');
+    revalidatePath('/players');
+    revalidatePath(`/player/${player.slug}`);
+    revalidatePath('/admin/players');
+
     return NextResponse.json({ player });
   } catch (error) {
     if (error instanceof Error && error.message.includes('duplicate key')) {
@@ -92,6 +98,10 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       resourceId: id,
       request,
     });
+
+    revalidatePath('/');
+    revalidatePath('/players');
+    revalidatePath('/admin/players');
 
     return NextResponse.json({ success: true });
   } catch (error) {

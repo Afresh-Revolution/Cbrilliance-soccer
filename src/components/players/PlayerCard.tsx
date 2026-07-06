@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Player } from '@/types';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
+import MediaImage from '@/components/common/MediaImage';
 
 interface PlayerCardProps {
   player: Player;
@@ -16,7 +16,7 @@ export default function PlayerCard({ player }: PlayerCardProps) {
         <span className="player-card-v2__num">{player.jerseyNumber}</span>
       )}
       <div className="player-card-v2__photo">
-        <Image
+        <MediaImage
           src={player.profilePhoto}
           alt={player.fullName}
           fill

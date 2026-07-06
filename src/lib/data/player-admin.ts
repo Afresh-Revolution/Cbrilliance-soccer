@@ -1,6 +1,7 @@
 import type { Player } from '@/types';
 import { calculateAge, slugify } from '@/lib/utils/format';
 import { isSupabaseApiConfigured } from '@/lib/db/env';
+import { resolveMediaUrl, resolveMediaUrls, canonicalMediaStorageUrl } from '@/lib/data/cbfc-media';
 import type { z } from 'zod';
 import type { adminPlayerSchema } from '@/lib/validators/schemas';
 import { seedPlayers } from './seed';
@@ -13,7 +14,7 @@ function mapDbPlayer(row: Record<string, unknown>): Player {
     id: row.id as string,
     fullName: row.full_name as string,
     slug: row.slug as string,
-    profilePhoto: (row.profile_photo as string) || '',
+    profilePhoto: resolveMediaUrl((row.profile_photo as string) || ''),
     dateOfBirth: dob,
     age: calculateAge(dob),
     nationality: row.nationality as string,
@@ -33,7 +34,7 @@ function mapDbPlayer(row: Record<string, unknown>): Player {
     achievements: (row.achievements as Player['achievements']) || [],
     previousClubs: (row.previous_clubs as Player['previousClubs']) || [],
     videos: (row.videos as string[]) || [],
-    images: (row.images as string[]) || [],
+    images: resolveMediaUrls(row.images as string[]),
     movementHistory: (row.movement_history as Player['movementHistory']) || [],
     status: row.status as Player['status'],
     academyGraduate: row.academy_graduate as boolean,
@@ -49,7 +50,7 @@ function toDbRow(input: AdminPlayerInput, slug: string) {
   return {
     full_name: input.fullName.trim(),
     slug,
-    profile_photo: input.profilePhoto?.trim() || null,
+    profile_photo: input.profilePhoto?.trim() ? canonicalMediaStorageUrl(input.profilePhoto.trim()) : null,
     date_of_birth: input.dateOfBirth,
     nationality: input.nationality.trim(),
     position: input.position,
@@ -81,6 +82,25 @@ function toDbRow(input: AdminPlayerInput, slug: string) {
 async function getServiceSupabase() {
   const { createServiceClient } = await import('@/lib/db/supabase/server');
   return createServiceClient();
+}
+
+export async function getAllPlayers(): Promise<Player[]> {
+  if (!isSupabaseApiConfigured()) {
+    return [...seedPlayers];
+  }
+
+  const supabase = await getServiceSupabase();
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[getAllPlayers]', error.message);
+    return [];
+  }
+
+  return (data ?? []).map(mapDbPlayer);
 }
 
 export async function getPlayerById(id: string): Promise<Player | null> {
@@ -116,7 +136,11 @@ export async function updatePlayer(id: string, input: Partial<AdminPlayerInput>)
   const patch: Record<string, unknown> = {};
   if (input.fullName !== undefined) patch.full_name = input.fullName.trim();
   if (input.slug !== undefined) patch.slug = input.slug.trim();
-  if (input.profilePhoto !== undefined) patch.profile_photo = input.profilePhoto.trim() || null;
+  if (input.profilePhoto !== undefined) {
+    patch.profile_photo = input.profilePhoto.trim()
+      ? canonicalMediaStorageUrl(input.profilePhoto.trim())
+      : null;
+  }
   if (input.dateOfBirth !== undefined) patch.date_of_birth = input.dateOfBirth;
   if (input.nationality !== undefined) patch.nationality = input.nationality.trim();
   if (input.position !== undefined) patch.position = input.position;

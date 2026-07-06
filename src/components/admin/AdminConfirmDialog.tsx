@@ -6,6 +6,7 @@ interface Props {
   confirmLabel?: string;
   cancelLabel?: string;
   busy?: boolean;
+  error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -16,6 +17,7 @@ export default function AdminConfirmDialog({
   confirmLabel = 'Delete',
   cancelLabel = 'Cancel',
   busy = false,
+  error = null,
   onConfirm,
   onCancel,
 }: Props) {
@@ -44,6 +46,11 @@ export default function AdminConfirmDialog({
         <p id="admin-confirm-message" className="admin-confirm__message">
           {message}
         </p>
+        {error && (
+          <p className="admin-confirm__error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="admin-confirm__actions">
           <button
             type="button"

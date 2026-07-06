@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import type { Video } from '@/types';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
 import { fetchCsrfToken, patchWithCsrf, deleteWithCsrf } from '@/lib/auth/csrf-client';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 
 function displayPosition(video: Video) {
   if (!video.position) return 'All';
@@ -73,6 +74,8 @@ export default function AdminVideosTable({ videos: initialVideos }: { videos: Vi
   const [videos, setVideos] = useState(initialVideos);
   const [viewVideo, setViewVideo] = useState<Video | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Video | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleToggleFeatured(video: Video) {
     setBusyId(video.id);
@@ -96,10 +99,12 @@ export default function AdminVideosTable({ videos: initialVideos }: { videos: Vi
     }
   }
 
-  async function handleDelete(video: Video) {
-    if (!confirm(`Delete "${video.title}"? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!deleteTarget) return;
 
+    const video = deleteTarget;
     setBusyId(video.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -107,16 +112,31 @@ export default function AdminVideosTable({ videos: initialVideos }: { videos: Vi
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete video');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete video');
         return;
       }
       setVideos((prev) => prev.filter((v) => v.id !== video.id));
+      if (viewVideo?.id === video.id) {
+        setViewVideo(null);
+      }
+      setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete video');
+      setDeleteError('Failed to delete video');
     } finally {
       setBusyId(null);
     }
+  }
+
+  function openDeleteDialog(video: Video) {
+    setDeleteError(null);
+    setDeleteTarget(video);
+  }
+
+  function closeDeleteDialog() {
+    if (busyId) return;
+    setDeleteTarget(null);
+    setDeleteError(null);
   }
 
   return (
@@ -193,7 +213,7 @@ export default function AdminVideosTable({ videos: initialVideos }: { videos: Vi
                         type="button"
                         className="btn btn--outline btn--sm admin-videos__delete"
                         disabled={busyId === video.id}
-                        onClick={() => handleDelete(video)}
+                        onClick={() => openDeleteDialog(video)}
                       >
                         Delete
                       </button>
@@ -207,6 +227,18 @@ export default function AdminVideosTable({ videos: initialVideos }: { videos: Vi
       </div>
 
       {viewVideo && <VideoViewModal video={viewVideo} onClose={() => setViewVideo(null)} />}
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete video?"
+          message={`"${deleteTarget.title}" will be permanently removed. This cannot be undone.`}
+          confirmLabel="Delete video"
+          busy={busyId === deleteTarget.id}
+          error={deleteError}
+          onCancel={closeDeleteDialog}
+          onConfirm={confirmDelete}
+        />
+      )}
     </>
   );
 }

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Player, PlayerStatus } from '@/types';
 import { POSITION_LABELS, STATUS_LABELS } from '@/lib/constants/navigation';
 import { fetchCsrfToken, patchWithCsrf, deleteWithCsrf } from '@/lib/auth/csrf-client';
+import MediaImage from '@/components/common/MediaImage';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 
 const STATUSES = Object.keys(STATUS_LABELS) as PlayerStatus[];
 
@@ -26,7 +27,7 @@ function PlayerAvatar({ player }: { player: Player }) {
 
   if (player.profilePhoto) {
     return (
-      <Image
+      <MediaImage
         src={player.profilePhoto}
         alt={player.fullName}
         width={40}
@@ -85,6 +86,8 @@ export default function AdminPlayersTable({ players: initialPlayers }: { players
   const [players, setPlayers] = useState(initialPlayers);
   const [viewPlayer, setViewPlayer] = useState<Player | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Player | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleStatusChange(playerId: string, status: PlayerStatus) {
     setBusyId(playerId);
@@ -108,10 +111,12 @@ export default function AdminPlayersTable({ players: initialPlayers }: { players
     }
   }
 
-  async function handleDelete(player: Player) {
-    if (!confirm(`Delete ${player.fullName}? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!deleteTarget) return;
 
+    const player = deleteTarget;
     setBusyId(player.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -119,16 +124,31 @@ export default function AdminPlayersTable({ players: initialPlayers }: { players
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete player');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete player');
         return;
       }
       setPlayers((prev) => prev.filter((p) => p.id !== player.id));
+      if (viewPlayer?.id === player.id) {
+        setViewPlayer(null);
+      }
+      setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete player');
+      setDeleteError('Failed to delete player');
     } finally {
       setBusyId(null);
     }
+  }
+
+  function openDeleteDialog(player: Player) {
+    setDeleteError(null);
+    setDeleteTarget(player);
+  }
+
+  function closeDeleteDialog() {
+    if (busyId) return;
+    setDeleteTarget(null);
+    setDeleteError(null);
   }
 
   return (
@@ -202,7 +222,7 @@ export default function AdminPlayersTable({ players: initialPlayers }: { players
                         type="button"
                         className="btn btn--outline btn--sm admin-players__delete"
                         disabled={busyId === player.id}
-                        onClick={() => handleDelete(player)}
+                        onClick={() => openDeleteDialog(player)}
                       >
                         Delete
                       </button>
@@ -216,6 +236,18 @@ export default function AdminPlayersTable({ players: initialPlayers }: { players
       </div>
 
       {viewPlayer && <PlayerViewModal player={viewPlayer} onClose={() => setViewPlayer(null)} />}
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete player?"
+          message={`${deleteTarget.fullName} will be permanently removed from the squad. This cannot be undone.`}
+          confirmLabel="Delete player"
+          busy={busyId === deleteTarget.id}
+          error={deleteError}
+          onCancel={closeDeleteDialog}
+          onConfirm={confirmDelete}
+        />
+      )}
     </>
   );
 }

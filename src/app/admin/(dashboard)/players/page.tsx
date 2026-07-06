@@ -1,8 +1,10 @@
-import { getPlayers } from '@/lib/data/queries';
+import { getAllPlayers } from '@/lib/data/player-admin';
 import AdminPlayersTable from '@/components/admin/AdminPlayersTable';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPlayersPage() {
-  const players = await getPlayers();
+  const players = await getAllPlayers();
 
   return (
     <>

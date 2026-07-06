@@ -26,7 +26,7 @@ const LOCAL_MEDIA: Record<string, string> = {
   [CBFC_MEDIA_KEYS.chocho.back]: '/media/Chocho-back.png',
 };
 
-const MEDIA_KEY_PREFIXES = ['cbfc/', 'gallery/', 'media/', 'academy/'] as const;
+const MEDIA_KEY_PREFIXES = ['cbfc/', 'gallery/', 'media/', 'academy/', 'players/'] as const;
 
 export function shouldUseB2Media(): boolean {
   const base = process.env.NEXT_PUBLIC_B2_PUBLIC_URL;
@@ -52,7 +52,7 @@ export function extractMediaKey(url: string): string | null {
   if (LOCAL_MEDIA[trimmed]) return trimmed;
 
   // Local static assets and proxied paths are handled elsewhere
-  if (trimmed.startsWith('/media/')) return null;
+  if (trimmed.startsWith('/media/') || trimmed.startsWith('/uploads/')) return null;
   if (trimmed.startsWith('/api/media/')) {
     return trimmed
       .slice('/api/media/'.length)
@@ -135,7 +135,7 @@ export function resolveMediaUrl(url: string | null | undefined): string {
 /** Skip Next.js image optimization for B2 and proxied media URLs. */
 export function shouldBypassImageOptimizer(url: string): boolean {
   const resolved = resolveMediaUrl(url);
-  return isRemoteMediaUrl(resolved) || resolved.startsWith('/api/media/');
+  return isRemoteMediaUrl(resolved) || resolved.startsWith('/api/media/') || resolved.startsWith('/uploads/');
 }
 
 export function resolveMediaUrls(urls: string[] | null | undefined): string[] {

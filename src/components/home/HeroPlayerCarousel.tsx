@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Player } from '@/types';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
+import MediaImage from '@/components/common/MediaImage';
 
 interface Props {
   players: Player[];
@@ -44,7 +44,7 @@ export default function HeroPlayerCarousel({ players }: Props) {
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Image
+            <MediaImage
               src={current.profilePhoto}
               alt={current.fullName}
               fill

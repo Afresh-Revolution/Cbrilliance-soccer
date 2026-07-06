@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Player } from '@/types';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
 import { seedFixtures } from '@/lib/data/seed';
-import { CBFC_FALLBACK_PLAYER_PHOTO } from '@/lib/data/cbfc-media';
+import MediaImage from '@/components/common/MediaImage';
 import PillTabs from '@/components/common/PillTabs';
 import PlayerDetailPanel from '@/components/players/PlayerDetailPanel';
 
@@ -18,8 +17,6 @@ const POSITIONS = [
   { id: 'midfielder', label: 'Midfielders' },
   { id: 'forward', label: 'Forwards' },
 ];
-
-const FALLBACK_PHOTO = CBFC_FALLBACK_PLAYER_PHOTO;
 
 function splitName(fullName: string) {
   const parts = fullName.trim().split(' ');
@@ -35,21 +32,14 @@ function PlayerPhoto({
   player: Player;
   priority?: boolean;
 }) {
-  const [src, setSrc] = useState(player.profilePhoto || FALLBACK_PHOTO);
-
-  useEffect(() => {
-    setSrc(player.profilePhoto || FALLBACK_PHOTO);
-  }, [player.profilePhoto]);
-
   return (
-    <Image
-      src={src}
+    <MediaImage
+      src={player.profilePhoto}
       alt={player.fullName}
       fill
       sizes="280px"
       className="squad-coverflow__img"
       priority={priority}
-      onError={() => setSrc(FALLBACK_PHOTO)}
     />
   );
 }

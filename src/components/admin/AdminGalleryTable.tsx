@@ -19,6 +19,7 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
   const [busyId, setBusyId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
   const [deleteTarget, setDeleteTarget] = useState<GalleryRecord | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function handleSaved(record: GalleryRecord) {
     setGallery((prev) => {
@@ -39,11 +40,12 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
 
     const item = deleteTarget;
     setBusyId(item.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(`/api/admin/gallery/${item.id}`, csrf);
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete gallery image');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete gallery image');
         return;
       }
       setGallery((prev) => prev.filter((entry) => entry.id !== item.id));
@@ -53,7 +55,7 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
       setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete gallery image');
+      setDeleteError('Failed to delete gallery image');
     } finally {
       setBusyId(null);
     }
@@ -125,7 +127,10 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
                         type="button"
                         className="btn btn--outline btn--sm admin-videos__delete"
                         disabled={busyId === item.id}
-                        onClick={() => setDeleteTarget(item)}
+                        onClick={() => {
+                          setDeleteError(null);
+                          setDeleteTarget(item);
+                        }}
                       >
                         Delete
                       </button>
@@ -153,7 +158,12 @@ export default function AdminGalleryTable({ gallery: initialGallery }: { gallery
           message={`"${deleteTarget.title}" will be removed from the club gallery. This cannot be undone.`}
           confirmLabel="Delete image"
           busy={busyId === deleteTarget.id}
-          onCancel={() => setDeleteTarget(null)}
+          error={deleteError}
+          onCancel={() => {
+            if (busyId) return;
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }}
           onConfirm={confirmDelete}
         />
       )}

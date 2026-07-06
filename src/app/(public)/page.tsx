@@ -4,16 +4,17 @@ import StatsSection from '@/components/home/StatsSection';
 import FeaturedPlayersSection from '@/components/home/FeaturedPlayersSection';
 import ActivitySection from '@/components/home/ActivitySection';
 import VideoHighlightsSection from '@/components/home/VideoHighlightsSection';
-import { getPlayers, getSiteStats } from '@/lib/data/queries';
+import { getPlayers, getSiteStats, prioritizeFeaturedPlayers } from '@/lib/data/queries';
+
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [stats, featuredPlayers, allPlayers] = await Promise.all([
+  const [stats, allPlayers] = await Promise.all([
     getSiteStats(),
-    getPlayers({ featured: true }),
     getPlayers(),
   ]);
 
-  const heroPlayers = featuredPlayers.length > 0 ? featuredPlayers : allPlayers;
+  const heroPlayers = prioritizeFeaturedPlayers(allPlayers, 6);
 
   return (
     <>

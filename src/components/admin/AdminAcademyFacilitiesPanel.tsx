@@ -29,6 +29,7 @@ export default function AdminAcademyFacilitiesPanel({ initialSection }: Props) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
   const [deleteTarget, setDeleteTarget] = useState<AcademyFacility | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleSaveSettings(e: React.FormEvent) {
     e.preventDefault();
@@ -77,6 +78,7 @@ export default function AdminAcademyFacilitiesPanel({ initialSection }: Props) {
 
     const item = deleteTarget;
     setBusyId(item.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -84,7 +86,7 @@ export default function AdminAcademyFacilitiesPanel({ initialSection }: Props) {
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete facility');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete facility');
         return;
       }
       setFacilities((prev) => prev.filter((entry) => entry.id !== item.id));
@@ -94,7 +96,7 @@ export default function AdminAcademyFacilitiesPanel({ initialSection }: Props) {
       setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete facility');
+      setDeleteError('Failed to delete facility');
     } finally {
       setBusyId(null);
     }
@@ -197,7 +199,10 @@ export default function AdminAcademyFacilitiesPanel({ initialSection }: Props) {
                         type="button"
                         className="btn btn--outline btn--sm admin-videos__delete"
                         disabled={busyId === item.id}
-                        onClick={() => setDeleteTarget(item)}
+                        onClick={() => {
+                          setDeleteError(null);
+                          setDeleteTarget(item);
+                        }}
                       >
                         Delete
                       </button>
@@ -225,8 +230,13 @@ export default function AdminAcademyFacilitiesPanel({ initialSection }: Props) {
           message={`Remove "${deleteTarget.name}" from the Academy facilities section?`}
           confirmLabel="Delete"
           onConfirm={confirmDelete}
-          onCancel={() => setDeleteTarget(null)}
+          onCancel={() => {
+            if (busyId) return;
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }}
           busy={busyId === deleteTarget.id}
+          error={deleteError}
         />
       )}
     </>

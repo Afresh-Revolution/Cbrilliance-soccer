@@ -40,6 +40,7 @@ export default function AdminActivityTable({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>(null);
   const [deleteTarget, setDeleteTarget] = useState<ActivityItem | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const playerName = (playerId?: string) =>
     players.find((p) => p.id === playerId)?.fullName ?? '—';
@@ -63,11 +64,12 @@ export default function AdminActivityTable({
 
     const item = deleteTarget;
     setBusyId(item.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(`/api/admin/activity/${item.id}`, csrf);
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete activity');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete activity');
         return;
       }
       setActivities((prev) => prev.filter((entry) => entry.id !== item.id));
@@ -77,7 +79,7 @@ export default function AdminActivityTable({
       setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete activity');
+      setDeleteError('Failed to delete activity');
     } finally {
       setBusyId(null);
     }
@@ -140,7 +142,10 @@ export default function AdminActivityTable({
                         type="button"
                         className="btn btn--outline btn--sm admin-videos__delete"
                         disabled={busyId === item.id}
-                        onClick={() => setDeleteTarget(item)}
+                        onClick={() => {
+                          setDeleteError(null);
+                          setDeleteTarget(item);
+                        }}
                       >
                         Delete
                       </button>
@@ -169,8 +174,13 @@ export default function AdminActivityTable({
           message={`Remove "${deleteTarget.title}" from the activity feed?`}
           confirmLabel="Delete"
           onConfirm={confirmDelete}
-          onCancel={() => setDeleteTarget(null)}
+          onCancel={() => {
+            if (busyId) return;
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }}
           busy={busyId === deleteTarget.id}
+          error={deleteError}
         />
       )}
     </>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Fixture } from '@/types';
 import { fetchCsrfToken, deleteWithCsrf } from '@/lib/auth/csrf-client';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 
 function formatMatchDate(date: string) {
   return new Date(date).toLocaleDateString('en-US', {
@@ -27,14 +28,17 @@ export default function AdminFixturesTable({ fixtures: initialFixtures }: { fixt
   const router = useRouter();
   const [fixtures, setFixtures] = useState(initialFixtures);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Fixture | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const upcomingCount = fixtures.filter((f) => f.isUpcoming).length;
 
-  async function handleDelete(fixture: Fixture) {
-    const label = `${fixture.homeTeam} vs ${fixture.awayTeam}`;
-    if (!confirm(`Delete "${label}"? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!deleteTarget) return;
 
+    const fixture = deleteTarget;
     setBusyId(fixture.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -42,16 +46,28 @@ export default function AdminFixturesTable({ fixtures: initialFixtures }: { fixt
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete fixture');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete fixture');
         return;
       }
       setFixtures((prev) => prev.filter((f) => f.id !== fixture.id));
+      setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete fixture');
+      setDeleteError('Failed to delete fixture');
     } finally {
       setBusyId(null);
     }
+  }
+
+  function openDeleteDialog(fixture: Fixture) {
+    setDeleteError(null);
+    setDeleteTarget(fixture);
+  }
+
+  function closeDeleteDialog() {
+    if (busyId) return;
+    setDeleteTarget(null);
+    setDeleteError(null);
   }
 
   return (
@@ -107,7 +123,7 @@ export default function AdminFixturesTable({ fixtures: initialFixtures }: { fixt
                         type="button"
                         className="btn btn--outline btn--sm admin-videos__delete"
                         disabled={busyId === fixture.id}
-                        onClick={() => handleDelete(fixture)}
+                        onClick={() => openDeleteDialog(fixture)}
                       >
                         Delete
                       </button>
@@ -119,6 +135,18 @@ export default function AdminFixturesTable({ fixtures: initialFixtures }: { fixt
           </tbody>
         </table>
       </div>
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete fixture?"
+          message={`${deleteTarget.homeTeam} vs ${deleteTarget.awayTeam} will be permanently removed. This cannot be undone.`}
+          confirmLabel="Delete fixture"
+          busy={busyId === deleteTarget.id}
+          error={deleteError}
+          onCancel={closeDeleteDialog}
+          onConfirm={confirmDelete}
+        />
+      )}
     </>
   );
 }

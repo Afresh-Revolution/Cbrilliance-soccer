@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { AdminInquiryDetail, InquiryStatus } from '@/types';
 import { INQUIRY_STATUS_LABELS } from '@/lib/constants/navigation';
 import { fetchCsrfToken, patchWithCsrf, deleteWithCsrf } from '@/lib/auth/csrf-client';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 
 const STATUS_OPTIONS: InquiryStatus[] = ['new', 'pending', 'contacted', 'closed'];
 
@@ -61,6 +62,8 @@ export default function AdminInquiriesTable({
   const [inquiries, setInquiries] = useState(initialInquiries);
   const [viewInquiry, setViewInquiry] = useState<AdminInquiryDetail | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminInquiryDetail | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const activeCount = inquiries.filter((i) => i.status !== 'closed').length;
 
@@ -96,11 +99,13 @@ export default function AdminInquiriesTable({
     }
   }
 
-  async function handleDelete(inquiry: AdminInquiryDetail) {
-    if (!confirm(`Delete inquiry from ${inquiry.name}? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!deleteTarget) return;
 
+    const inquiry = deleteTarget;
     const key = rowKey(inquiry);
     setBusyKey(key);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -108,19 +113,31 @@ export default function AdminInquiriesTable({
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete inquiry');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete inquiry');
         return;
       }
       setInquiries((prev) => prev.filter((i) => rowKey(i) !== key));
       if (viewInquiry && rowKey(viewInquiry) === key) {
         setViewInquiry(null);
       }
+      setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete inquiry');
+      setDeleteError('Failed to delete inquiry');
     } finally {
       setBusyKey(null);
     }
+  }
+
+  function openDeleteDialog(inquiry: AdminInquiryDetail) {
+    setDeleteError(null);
+    setDeleteTarget(inquiry);
+  }
+
+  function closeDeleteDialog() {
+    if (busyKey) return;
+    setDeleteTarget(null);
+    setDeleteError(null);
   }
 
   return (
@@ -188,7 +205,7 @@ export default function AdminInquiriesTable({
                           type="button"
                           className="btn btn--outline btn--sm admin-inquiries__delete"
                           disabled={busyKey === key}
-                          onClick={() => handleDelete(inquiry)}
+                          onClick={() => openDeleteDialog(inquiry)}
                         >
                           Delete
                         </button>
@@ -204,6 +221,18 @@ export default function AdminInquiriesTable({
 
       {viewInquiry && (
         <InquiryViewModal inquiry={viewInquiry} onClose={() => setViewInquiry(null)} />
+      )}
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete inquiry?"
+          message={`The inquiry from ${deleteTarget.name} will be permanently removed. This cannot be undone.`}
+          confirmLabel="Delete inquiry"
+          busy={busyKey === rowKey(deleteTarget)}
+          error={deleteError}
+          onCancel={closeDeleteDialog}
+          onConfirm={confirmDelete}
+        />
       )}
     </>
   );

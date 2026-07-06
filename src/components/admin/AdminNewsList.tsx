@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import type { NewsArticle } from '@/types';
 import { NEWS_CATEGORY_LABELS } from '@/lib/constants/navigation';
 import { fetchCsrfToken, patchWithCsrf, deleteWithCsrf } from '@/lib/auth/csrf-client';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 
 function formatArticleDate(date: string) {
   return new Date(date).toLocaleDateString('en-US', {
@@ -36,6 +37,8 @@ export default function AdminNewsList({ articles: initialArticles }: { articles:
   const router = useRouter();
   const [articles, setArticles] = useState(initialArticles);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<NewsArticle | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const publishedCount = articles.filter((a) => a.published).length;
 
@@ -61,10 +64,12 @@ export default function AdminNewsList({ articles: initialArticles }: { articles:
     }
   }
 
-  async function handleDelete(article: NewsArticle) {
-    if (!confirm(`Delete "${article.title}"? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!deleteTarget) return;
 
+    const article = deleteTarget;
     setBusyId(article.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -72,16 +77,28 @@ export default function AdminNewsList({ articles: initialArticles }: { articles:
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete article');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete article');
         return;
       }
       setArticles((prev) => prev.filter((a) => a.id !== article.id));
+      setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete article');
+      setDeleteError('Failed to delete article');
     } finally {
       setBusyId(null);
     }
+  }
+
+  function openDeleteDialog(article: NewsArticle) {
+    setDeleteError(null);
+    setDeleteTarget(article);
+  }
+
+  function closeDeleteDialog() {
+    if (busyId) return;
+    setDeleteTarget(null);
+    setDeleteError(null);
   }
 
   return (
@@ -132,7 +149,7 @@ export default function AdminNewsList({ articles: initialArticles }: { articles:
                   type="button"
                   className="btn btn--outline btn--sm admin-news__delete"
                   disabled={busyId === article.id}
-                  onClick={() => handleDelete(article)}
+                  onClick={() => openDeleteDialog(article)}
                 >
                   Delete
                 </button>
@@ -141,6 +158,18 @@ export default function AdminNewsList({ articles: initialArticles }: { articles:
           ))
         )}
       </div>
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete article?"
+          message={`"${deleteTarget.title}" will be permanently removed. This cannot be undone.`}
+          confirmLabel="Delete article"
+          busy={busyId === deleteTarget.id}
+          error={deleteError}
+          onCancel={closeDeleteDialog}
+          onConfirm={confirmDelete}
+        />
+      )}
     </>
   );
 }

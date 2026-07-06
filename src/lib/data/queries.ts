@@ -114,8 +114,7 @@ export async function getPlayers(filters?: {
     return players;
   }
 
-  const { createClient } = await import('@/lib/db/supabase/server');
-  const supabase = await createClient();
+  const supabase = await getDbClient();
   let query = supabase.from('players').select('*').order('created_at', { ascending: false });
 
   if (filters?.status) query = query.eq('status', filters.status);
@@ -124,8 +123,19 @@ export async function getPlayers(filters?: {
   if (filters?.search) query = query.ilike('full_name', `%${filters.search}%`);
 
   const { data, error } = await query;
-  if (error || !data) return seedPlayers;
-  return data.map(mapDbPlayer);
+  if (error) {
+    console.error('[getPlayers]', error.message);
+    return [];
+  }
+  return (data ?? []).map(mapDbPlayer);
+}
+
+/** Featured players first, then newest — for homepage showcases. */
+export function prioritizeFeaturedPlayers(players: Player[], limit = 3): Player[] {
+  const featured = players.filter((p) => p.featured);
+  const featuredIds = new Set(featured.map((p) => p.id));
+  const rest = players.filter((p) => !featuredIds.has(p.id));
+  return [...featured, ...rest].slice(0, limit);
 }
 
 export async function getPlayerBySlug(slug: string): Promise<Player | null> {
@@ -133,10 +143,9 @@ export async function getPlayerBySlug(slug: string): Promise<Player | null> {
     return seedPlayers.find((p) => p.slug === slug) || null;
   }
 
-  const { createClient } = await import('@/lib/db/supabase/server');
-  const supabase = await createClient();
+  const supabase = await getDbClient();
   const { data, error } = await supabase.from('players').select('*').eq('slug', slug).single();
-  if (error || !data) return seedPlayers.find((p) => p.slug === slug) || null;
+  if (error || !data) return null;
   return mapDbPlayer(data);
 }
 

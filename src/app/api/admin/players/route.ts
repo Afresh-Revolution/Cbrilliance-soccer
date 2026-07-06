@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthContext } from '@/lib/auth/session';
 import { requirePermission } from '@/lib/auth/rbac';
@@ -32,6 +33,10 @@ export async function POST(request: NextRequest) {
       resourceId: player.id,
       request,
     });
+
+    revalidatePath('/');
+    revalidatePath('/players');
+    revalidatePath('/admin/players');
 
     return NextResponse.json({ player }, { status: 201 });
   } catch (error) {

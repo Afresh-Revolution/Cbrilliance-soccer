@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ClubStaffRecord } from '@/lib/data/staff-admin';
 import { fetchCsrfToken, deleteWithCsrf } from '@/lib/auth/csrf-client';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 
 function StaffAvatar({ member }: { member: ClubStaffRecord }) {
   const initial = member.name.trim().charAt(0).toUpperCase() || '?';
@@ -29,11 +30,15 @@ export default function AdminStaffGrid({ staff: initialStaff }: { staff: ClubSta
   const router = useRouter();
   const [staff, setStaff] = useState(initialStaff);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ClubStaffRecord | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  async function handleDelete(member: ClubStaffRecord) {
-    if (!confirm(`Remove ${member.name} from staff? This cannot be undone.`)) return;
+  async function confirmDelete() {
+    if (!deleteTarget) return;
 
+    const member = deleteTarget;
     setBusyId(member.id);
+    setDeleteError(null);
     try {
       const csrf = await fetchCsrfToken();
       const { ok, data } = await deleteWithCsrf<{ error?: string }>(
@@ -41,16 +46,28 @@ export default function AdminStaffGrid({ staff: initialStaff }: { staff: ClubSta
         csrf,
       );
       if (!ok) {
-        alert(typeof data.error === 'string' ? data.error : 'Failed to delete staff member');
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Failed to delete staff member');
         return;
       }
       setStaff((prev) => prev.filter((s) => s.id !== member.id));
+      setDeleteTarget(null);
       router.refresh();
     } catch {
-      alert('Failed to delete staff member');
+      setDeleteError('Failed to delete staff member');
     } finally {
       setBusyId(null);
     }
+  }
+
+  function openDeleteDialog(member: ClubStaffRecord) {
+    setDeleteError(null);
+    setDeleteTarget(member);
+  }
+
+  function closeDeleteDialog() {
+    if (busyId) return;
+    setDeleteTarget(null);
+    setDeleteError(null);
   }
 
   return (
@@ -89,7 +106,7 @@ export default function AdminStaffGrid({ staff: initialStaff }: { staff: ClubSta
                   type="button"
                   className="btn btn--outline btn--sm admin-staff__delete"
                   disabled={busyId === member.id}
-                  onClick={() => handleDelete(member)}
+                  onClick={() => openDeleteDialog(member)}
                 >
                   Delete
                 </button>
@@ -97,6 +114,18 @@ export default function AdminStaffGrid({ staff: initialStaff }: { staff: ClubSta
             </article>
           ))}
         </div>
+      )}
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Remove staff member?"
+          message={`${deleteTarget.name} will be removed from the club staff page. This cannot be undone.`}
+          confirmLabel="Remove"
+          busy={busyId === deleteTarget.id}
+          error={deleteError}
+          onCancel={closeDeleteDialog}
+          onConfirm={confirmDelete}
+        />
       )}
     </>
   );

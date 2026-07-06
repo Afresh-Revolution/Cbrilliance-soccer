@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import MediaImage from '@/components/common/MediaImage';
 import Link from 'next/link';
 import type { Player } from '@/types';
 import { POSITION_LABELS } from '@/lib/constants/navigation';
@@ -42,7 +42,7 @@ export default function PlayerProfileView({ player, whatsapp }: Props) {
             <div className="player-profile-v2__jersey jersey-num">{player.jerseyNumber}</div>
           )}
           <div className="player-profile-v2__photo-wrap">
-            <Image
+            <MediaImage
               src={player.profilePhoto}
               alt={player.fullName}
               width={600}

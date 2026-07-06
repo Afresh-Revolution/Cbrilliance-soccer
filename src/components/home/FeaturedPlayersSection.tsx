@@ -1,11 +1,11 @@
-import { getPlayers } from '@/lib/data/queries';
+import { getPlayers, prioritizeFeaturedPlayers } from '@/lib/data/queries';
 import PlayerCard from '@/components/players/PlayerCard';
 import FadeIn from '@/components/common/FadeIn';
 import Button from '@/components/common/Button';
 
 export default async function FeaturedPlayersSection() {
-  const featured = await getPlayers({ featured: true });
-  const players = featured.length > 0 ? featured : await getPlayers();
+  const allPlayers = await getPlayers();
+  const players = prioritizeFeaturedPlayers(allPlayers, 3);
 
   return (
     <section className="section section--surface">
@@ -17,7 +17,7 @@ export default async function FeaturedPlayersSection() {
         </div>
 
         <div className="grid grid--3">
-          {players.slice(0, 3).map((player, i) => (
+          {players.map((player, i) => (
             <FadeIn key={player.id} index={i}>
               <PlayerCard player={player} />
             </FadeIn>
