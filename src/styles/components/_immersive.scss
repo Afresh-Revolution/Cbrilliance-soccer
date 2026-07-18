@@ -263,7 +263,7 @@
     gap: $spacing-lg;
     margin-top: $spacing-lg;
 
-    button {
+    > button {
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -298,9 +298,8 @@
     transition: all $transition-fast;
 
     &--active {
-      width: 24px;
-      border-radius: 100px;
       background: $color-premium-gold;
+      transform: scale(1.25);
     }
   }
 }

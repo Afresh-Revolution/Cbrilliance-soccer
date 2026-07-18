@@ -12,9 +12,6 @@ interface PlayerCardProps {
 export default function PlayerCard({ player }: PlayerCardProps) {
   return (
     <Link href={`/player/${player.slug}`} className="player-card-v2">
-      {player.jerseyNumber && (
-        <span className="player-card-v2__num">{player.jerseyNumber}</span>
-      )}
       <div className="player-card-v2__photo">
         <MediaImage
           src={player.profilePhoto}
@@ -23,12 +20,21 @@ export default function PlayerCard({ player }: PlayerCardProps) {
           sizes="(max-width: 768px) 100vw, 33vw"
         />
         <div className="player-card-v2__gradient" />
+        {player.jerseyNumber && (
+          <span className="player-card-v2__num" aria-label={`Jersey number ${player.jerseyNumber}`}>
+            {player.jerseyNumber}
+          </span>
+        )}
       </div>
       <div className="player-card-v2__body">
         <h3 className="player-card-v2__name">{player.fullName}</h3>
-        <p className="player-card-v2__meta">
-          {POSITION_LABELS[player.position]} · {player.age} · {player.nationality}
-        </p>
+        <div className="player-card-v2__tags" aria-label="Player details">
+          <span className="player-card-v2__tag player-card-v2__tag--position">
+            {POSITION_LABELS[player.position]}
+          </span>
+          <span className="player-card-v2__tag">{player.age} yrs</span>
+          <span className="player-card-v2__tag">{player.nationality}</span>
+        </div>
       </div>
     </Link>
   );

@@ -1,17 +1,27 @@
 import type { Metadata } from 'next';
-import { Syne, DM_Sans } from 'next/font/google';
+import localFont from 'next/font/local';
 import '@/styles/main.scss';
 
-const syne = Syne({
-  subsets: ['latin'],
+const syne = localFont({
+  src: [
+    { path: '../fonts/syne/syne-latin-500-normal.woff2', weight: '500', style: 'normal' },
+    { path: '../fonts/syne/syne-latin-600-normal.woff2', weight: '600', style: 'normal' },
+    { path: '../fonts/syne/syne-latin-700-normal.woff2', weight: '700', style: 'normal' },
+    { path: '../fonts/syne/syne-latin-800-normal.woff2', weight: '800', style: 'normal' },
+  ],
   variable: '--font-display',
-  weight: ['500', '600', '700', '800'],
+  display: 'swap',
 });
 
-const dmSans = DM_Sans({
-  subsets: ['latin'],
+const dmSans = localFont({
+  src: [
+    { path: '../fonts/dm-sans/dm-sans-latin-400-normal.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/dm-sans/dm-sans-latin-500-normal.woff2', weight: '500', style: 'normal' },
+    { path: '../fonts/dm-sans/dm-sans-latin-600-normal.woff2', weight: '600', style: 'normal' },
+    { path: '../fonts/dm-sans/dm-sans-latin-700-normal.woff2', weight: '700', style: 'normal' },
+  ],
   variable: '--font-body',
-  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
