@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { FOOTER_LINKS } from '@/lib/constants/navigation';
+import { getPublicContactEmail } from '@/lib/constants/contact';
 
 export default function Footer() {
+  const supportEmail = getPublicContactEmail();
+
   return (
     <footer className="footer">
       <div className="container">
@@ -40,9 +43,7 @@ export default function Footer() {
             <h4>Contact</h4>
             <ul>
               <li>
-                <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'info@cbfc.com'}`}>
-                  {process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'info@cbfc.com'}
-                </a>
+                <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
               </li>
               <li>
                 <a href={`tel:${process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1234567890'}`}>

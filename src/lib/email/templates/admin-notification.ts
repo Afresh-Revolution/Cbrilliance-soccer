@@ -56,25 +56,27 @@ export function renderAdminNotificationEmail(data: AdminNotificationEmailData): 
     : '';
 
   const bodyHtml = [
-    emailParagraph('A new submission has arrived on the CBFC website and is ready for review.'),
+    emailParagraph('A new submission has arrived on the CBFC website and needs your attention.'),
     detailsTable,
     messageBlock,
-    emailParagraph('Sign in to the admin dashboard to review and update the status.'),
+    emailParagraph(
+      'Please log in to the admin dashboard to review this notification and take action.',
+    ),
   ].join('');
 
   const html = renderEmailLayout({
     preheader: copy.preheader,
     title: copy.title,
     bodyHtml,
-    ctaLabel: 'Open admin dashboard',
+    ctaLabel: 'Log in & review',
     ctaHref: adminUrl,
-    footerNote: 'Internal notification — CBFC admin.',
+    footerNote: 'Internal CBFC support notification — please do not forward.',
   });
 
   const subjectMap: Record<SubmissionType, string> = {
-    contact: '[CBFC Admin] New contact enquiry',
-    academy: '[CBFC Admin] New academy application',
-    scout: '[CBFC Admin] New scout inquiry',
+    contact: '[CBFC] New contact enquiry — please log in to review',
+    academy: '[CBFC] New academy application — please log in to review',
+    scout: '[CBFC] New scout inquiry — please log in to review',
   };
 
   return { subject: subjectMap[data.type], html };

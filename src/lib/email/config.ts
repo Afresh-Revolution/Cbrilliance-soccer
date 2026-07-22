@@ -1,24 +1,24 @@
+import { SUPPORT_EMAIL, getPublicContactEmail } from '@/lib/constants/contact';
+
 export function isResendConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY?.trim());
 }
 
 export function getResendFrom(): string {
-  return process.env.RESEND_FROM?.trim() || 'CBFC <support@cbrilliancefc.com>';
+  return process.env.RESEND_FROM?.trim() || 'CBFC <onboarding@resend.dev>';
 }
 
 export function getSiteUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
 }
 
+/** Inbox that receives alerts when visitors submit forms / requests. */
 export function getAdminNotificationEmail(): string {
-  const explicit = process.env.ADMIN_NOTIFICATION_EMAIL?.trim();
-  if (explicit) return explicit;
-
-  const from = getResendFrom();
-  const match = from.match(/<([^>]+)>/);
-  if (match?.[1]) return match[1];
-
-  return process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || 'support@cbrilliancefc.com';
+  return (
+    process.env.ADMIN_NOTIFICATION_EMAIL?.trim() ||
+    getPublicContactEmail() ||
+    SUPPORT_EMAIL
+  );
 }
 
 export function getLogoUrl(): string {

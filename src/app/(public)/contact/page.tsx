@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Button from '@/components/common/Button';
 import { postPublicForm } from '@/lib/auth/public-form-client';
+import { getPublicContactEmail } from '@/lib/constants/contact';
 
 export default function ContactPage() {
   const [formState, setFormState] = useState({ loading: false, success: false, error: '' });
@@ -22,7 +23,7 @@ export default function ContactPage() {
     }
   }
 
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'info@cbfc.com';
+  const email = getPublicContactEmail();
   const phone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1234567890';
   const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '1234567890';
 
