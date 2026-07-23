@@ -228,6 +228,7 @@ const QUICK_ACTIONS = [
   { label: 'Add Video', href: '/admin/videos/new', icon: 'videos' },
   { label: 'Add Fixture', href: '/admin/fixtures/new', icon: 'fixtures' },
   { label: 'Upload Image', href: '/admin/gallery', icon: 'gallery' },
+  { label: 'Shop Items', href: '/admin/shop', icon: 'gallery' },
   { label: 'Review Applications', href: '/admin/applications', icon: 'applications' },
   { label: 'Manage Staff', href: '/admin/staff/new', icon: 'staff' },
 ];

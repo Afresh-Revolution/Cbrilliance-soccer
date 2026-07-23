@@ -4,7 +4,7 @@ import { guardPublicGet } from '@/lib/security/api-guard';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_KEY = /^(gallery|cbfc|media|academy|players)\/[a-zA-Z0-9._/-]+$/;
+const ALLOWED_KEY = /^(gallery|cbfc|media|academy|players|shop)\/[a-zA-Z0-9._/-]+$/;
 
 function sanitizeMediaKey(parts: string[]): string | null {
   const key = parts.map((part) => decodeURIComponent(part)).join('/');

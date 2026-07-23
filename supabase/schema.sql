@@ -3,9 +3,9 @@
 --
 -- Tables: profiles, players, academy_applications, scout_inquiries,
 --         contact_inquiries, news_articles, videos, club_staff, fixtures,
---         gallery_items, activity_items, site_stats, club_stats, audit_logs
+--         gallery_items, shop_products, activity_items, site_stats, club_stats, audit_logs
 --
--- Existing projects: run migrations in order (002 → 003 → 004) instead.
+-- Existing projects: run migrations in order (002 → 009) instead.
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -159,6 +159,18 @@ CREATE TABLE IF NOT EXISTS gallery_items (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Shop Products
+CREATE TABLE IF NOT EXISTS shop_products (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('jerseys', 'shorts', 'socks', 'boots')),
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Activity Feed
 CREATE TABLE IF NOT EXISTS activity_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -203,6 +215,7 @@ ALTER TABLE videos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE club_staff ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fixtures ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shop_products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE club_stats ENABLE ROW LEVEL SECURITY;
@@ -220,6 +233,8 @@ DROP POLICY IF EXISTS "Public read fixtures" ON fixtures;
 CREATE POLICY "Public read fixtures" ON fixtures FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Public read gallery" ON gallery_items;
 CREATE POLICY "Public read gallery" ON gallery_items FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public read shop products" ON shop_products;
+CREATE POLICY "Public read shop products" ON shop_products FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Public read activity" ON activity_items;
 CREATE POLICY "Public read activity" ON activity_items FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Public read site stats" ON site_stats;
@@ -292,6 +307,10 @@ DROP POLICY IF EXISTS "Admin full access gallery" ON gallery_items;
 CREATE POLICY "Admin full access gallery" ON gallery_items FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
 );
+DROP POLICY IF EXISTS "Admin full access shop products" ON shop_products;
+CREATE POLICY "Admin full access shop products" ON shop_products FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
+);
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_players_slug ON players(slug);
@@ -305,6 +324,8 @@ CREATE INDEX IF NOT EXISTS idx_news_published ON news_articles(published);
 CREATE INDEX IF NOT EXISTS idx_club_staff_sort_order ON club_staff(sort_order);
 CREATE INDEX IF NOT EXISTS idx_gallery_sort_order ON gallery_items(sort_order);
 CREATE INDEX IF NOT EXISTS idx_gallery_category ON gallery_items(category);
+CREATE INDEX IF NOT EXISTS idx_shop_products_sort_order ON shop_products(sort_order);
+CREATE INDEX IF NOT EXISTS idx_shop_products_category ON shop_products(category);
 CREATE INDEX IF NOT EXISTS idx_scout_inquiries_status ON scout_inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_scout_inquiries_created ON scout_inquiries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_contact_inquiries_status ON contact_inquiries(status);
@@ -329,6 +350,9 @@ CREATE TRIGGER news_updated_at BEFORE UPDATE ON news_articles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 DROP TRIGGER IF EXISTS gallery_updated_at ON gallery_items;
 CREATE TRIGGER gallery_updated_at BEFORE UPDATE ON gallery_items
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS shop_products_updated_at ON shop_products;
+CREATE TRIGGER shop_products_updated_at BEFORE UPDATE ON shop_products
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Insert default stats

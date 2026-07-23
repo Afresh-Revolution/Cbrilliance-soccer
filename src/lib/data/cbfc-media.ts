@@ -26,7 +26,7 @@ const LOCAL_MEDIA: Record<string, string> = {
   [CBFC_MEDIA_KEYS.chocho.back]: '/media/Chocho-back.png',
 };
 
-const MEDIA_KEY_PREFIXES = ['cbfc/', 'gallery/', 'media/', 'academy/', 'players/'] as const;
+const MEDIA_KEY_PREFIXES = ['cbfc/', 'gallery/', 'media/', 'academy/', 'players/', 'shop/'] as const;
 
 export function shouldUseB2Media(): boolean {
   const base = process.env.NEXT_PUBLIC_B2_PUBLIC_URL;

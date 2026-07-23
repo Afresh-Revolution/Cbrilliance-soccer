@@ -16,6 +16,7 @@ export function requiredPermissionForAdminPath(pathname: string): string | null 
     '/admin/videos',
     '/admin/staff',
     '/admin/gallery',
+    '/admin/shop',
     '/admin/academy-facilities',
     '/admin/fixtures',
     '/admin/activity',

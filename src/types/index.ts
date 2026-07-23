@@ -219,6 +219,17 @@ export interface GalleryItem {
   category: string;
 }
 
+export type ShopCategory = 'jerseys' | 'shorts' | 'socks' | 'boots';
+
+export interface ShopProduct {
+  id: string;
+  name: string;
+  description?: string;
+  imageUrl: string;
+  category: ShopCategory;
+  sortOrder: number;
+}
+
 export interface AcademyFacility {
   id: string;
   name: string;

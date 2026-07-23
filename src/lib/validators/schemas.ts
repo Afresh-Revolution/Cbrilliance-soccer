@@ -212,6 +212,18 @@ export const adminGallerySchema = z.object({
 
 export const adminGalleryPatchSchema = adminGallerySchema.partial();
 
+export const shopCategoryEnum = z.enum(['jerseys', 'shorts', 'socks', 'boots']);
+
+export const adminShopProductSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(120),
+  description: z.string().max(500).optional(),
+  imageUrl: safeMediaUrlSchema.refine((value) => value.trim().length > 0, 'Product image is required'),
+  category: shopCategoryEnum,
+  sortOrder: z.coerce.number().int().min(0).optional(),
+});
+
+export const adminShopProductPatchSchema = adminShopProductSchema.partial();
+
 const activityTypeEnum = z.enum(['trial', 'achievement', 'camp', 'club', 'agency']);
 
 export const adminActivitySchema = z.object({
