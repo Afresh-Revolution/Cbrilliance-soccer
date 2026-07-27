@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import type { ShopColorOption, ShopProduct } from '@/types';
 import { shopCategoryLabel } from '@/lib/data/shop-shared';
+import { useShopCart } from '@/lib/cart/shop-cart';
 import MediaImage from '@/components/common/MediaImage';
+import Button from '@/components/common/Button';
 
 interface Props {
   product: ShopProduct;
@@ -19,10 +21,34 @@ function isLightHex(hex: string): boolean {
 }
 
 export default function ShopProductCard({ product }: Props) {
+  const { addItem } = useShopCart();
   const [selectedColor, setSelectedColor] = useState<ShopColorOption | null>(
     product.colors[0] ?? null,
   );
   const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes[0] ?? null);
+  const [added, setAdded] = useState(false);
+
+  function handleAddToCart() {
+    if (product.colors.length > 0 && !selectedColor) return;
+    if (product.sizes.length > 0 && !selectedSize) return;
+
+    addItem({
+      productId: product.id,
+      productName: product.name,
+      category: product.category,
+      imageUrl: product.imageUrl,
+      color: selectedColor?.name ?? 'Default',
+      colorHex: selectedColor?.hex ?? '#000000',
+      size: selectedSize ?? 'One size',
+    });
+
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
+  }
+
+  const canAdd =
+    (product.colors.length === 0 || selectedColor) &&
+    (product.sizes.length === 0 || selectedSize);
 
   return (
     <article className="shop-now__card">
@@ -108,6 +134,19 @@ export default function ShopProductCard({ product }: Props) {
             </div>
           </div>
         ) : null}
+
+        <div className="shop-now__actions">
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            full
+            disabled={!canAdd}
+            onClick={handleAddToCart}
+          >
+            {added ? 'Added to cart' : 'Add to cart'}
+          </Button>
+        </div>
       </div>
     </article>
   );

@@ -233,6 +233,27 @@ export const adminShopProductSchema = z.object({
 
 export const adminShopProductPatchSchema = adminShopProductSchema.partial();
 
+export const shopCartItemSchema = z.object({
+  productId: z.string().uuid(),
+  productName: z.string().min(1).max(120),
+  category: shopCategoryEnum,
+  imageUrl: safeMediaUrlSchema,
+  color: z.string().min(1).max(40),
+  colorHex: z.string().regex(/^#([0-9A-Fa-f]{6})$/),
+  size: z.string().min(1).max(20),
+  quantity: z.coerce.number().int().min(1).max(20),
+});
+
+export const shopOrderSchema = z.object({
+  fullName: z.string().min(2, 'Name is required').max(120),
+  email: z.string().email('Valid email is required'),
+  phone: z.string().min(6, 'Phone number is required').max(30),
+  notes: z.string().max(1000).optional(),
+  items: z.array(shopCartItemSchema).min(1, 'Cart is empty'),
+});
+
+export const shopOrderStatusSchema = z.enum(['new', 'contacted', 'completed', 'cancelled']);
+
 const activityTypeEnum = z.enum(['trial', 'achievement', 'camp', 'club', 'agency']);
 
 export const adminActivitySchema = z.object({

@@ -237,6 +237,41 @@ export interface ShopProduct {
   sortOrder: number;
 }
 
+export interface ShopCartItem {
+  productId: string;
+  productName: string;
+  category: ShopCategory;
+  imageUrl: string;
+  color: string;
+  colorHex: string;
+  size: string;
+  quantity: number;
+}
+
+export type ShopOrderStatus = 'new' | 'contacted' | 'completed' | 'cancelled';
+
+export interface ShopOrderItem {
+  productId: string;
+  productName: string;
+  category: ShopCategory;
+  imageUrl: string;
+  color: string;
+  colorHex: string;
+  size: string;
+  quantity: number;
+}
+
+export interface ShopOrder {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  notes?: string;
+  items: ShopOrderItem[];
+  status: ShopOrderStatus;
+  createdAt: string;
+}
+
 export interface AcademyFacility {
   id: string;
   name: string;

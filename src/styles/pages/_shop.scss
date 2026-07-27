@@ -1,0 +1,121 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+@use '../abstracts/breakpoints' as *;
+
+.shop-cart {
+  &__empty,
+  &__success {
+    text-align: center;
+    max-width: 520px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    align-items: center;
+  }
+
+  &__layout {
+    display: grid;
+    gap: $spacing-3xl;
+
+    @media (min-width: 1024px) {
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: start;
+    }
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__item {
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    background: rgba($color-navy-panel, 0.5);
+    border: 1px solid $color-border-gray;
+    border-radius: $radius-lg;
+  }
+
+  &__thumb {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    overflow: hidden;
+    background: rgba($color-navy-elevated, 0.8);
+  }
+
+  &__details {
+    h2 {
+      font-size: 1rem;
+      margin: 0 0 $spacing-xs;
+    }
+  }
+
+  &__category {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $color-premium-gold;
+    margin: 0 0 $spacing-xs;
+  }
+
+  &__meta {
+    font-size: 0.8125rem;
+    color: $color-muted-gray;
+    margin: 0 0 $spacing-sm;
+  }
+
+  &__qty {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    border: 1px solid $color-border-gray;
+
+    button {
+      appearance: none;
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      background: transparent;
+      color: $color-soft-light;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    span {
+      min-width: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+    }
+  }
+
+  &__remove {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: $color-muted-gray;
+    cursor: pointer;
+    font-size: 0.75rem;
+    align-self: start;
+
+    &:hover {
+      color: $color-danger;
+    }
+  }
+
+  &__checkout {
+    padding: $spacing-xl;
+    background: rgba($color-navy-panel, 0.5);
+    border: 1px solid $color-border-gray;
+    border-radius: $radius-lg;
+
+    h2 {
+      margin: 0 0 $spacing-lg;
+      font-size: 1.125rem;
+    }
+  }
+}

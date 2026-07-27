@@ -5,7 +5,7 @@
 --         contact_inquiries, news_articles, videos, club_staff, fixtures,
 --         gallery_items, shop_products, activity_items, site_stats, club_stats, audit_logs
 --
--- Existing projects: run migrations in order (002 → 010) instead.
+-- Existing projects: run migrations in order (002 → 011) instead.
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -173,6 +173,19 @@ CREATE TABLE IF NOT EXISTS shop_products (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Shop Orders
+CREATE TABLE IF NOT EXISTS shop_orders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  notes TEXT,
+  items JSONB NOT NULL DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'completed', 'cancelled')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Activity Feed
 CREATE TABLE IF NOT EXISTS activity_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -218,6 +231,7 @@ ALTER TABLE club_staff ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fixtures ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shop_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shop_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE club_stats ENABLE ROW LEVEL SECURITY;
@@ -313,6 +327,10 @@ DROP POLICY IF EXISTS "Admin full access shop products" ON shop_products;
 CREATE POLICY "Admin full access shop products" ON shop_products FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
 );
+DROP POLICY IF EXISTS "Admin full access shop orders" ON shop_orders;
+CREATE POLICY "Admin full access shop orders" ON shop_orders FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('super_admin', 'content_admin'))
+);
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_players_slug ON players(slug);
@@ -328,6 +346,8 @@ CREATE INDEX IF NOT EXISTS idx_gallery_sort_order ON gallery_items(sort_order);
 CREATE INDEX IF NOT EXISTS idx_gallery_category ON gallery_items(category);
 CREATE INDEX IF NOT EXISTS idx_shop_products_sort_order ON shop_products(sort_order);
 CREATE INDEX IF NOT EXISTS idx_shop_products_category ON shop_products(category);
+CREATE INDEX IF NOT EXISTS idx_shop_orders_status ON shop_orders(status);
+CREATE INDEX IF NOT EXISTS idx_shop_orders_created ON shop_orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_scout_inquiries_status ON scout_inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_scout_inquiries_created ON scout_inquiries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_contact_inquiries_status ON contact_inquiries(status);
@@ -355,6 +375,9 @@ CREATE TRIGGER gallery_updated_at BEFORE UPDATE ON gallery_items
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 DROP TRIGGER IF EXISTS shop_products_updated_at ON shop_products;
 CREATE TRIGGER shop_products_updated_at BEFORE UPDATE ON shop_products
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+DROP TRIGGER IF EXISTS shop_orders_updated_at ON shop_orders;
+CREATE TRIGGER shop_orders_updated_at BEFORE UPDATE ON shop_orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Insert default stats

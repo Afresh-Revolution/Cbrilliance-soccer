@@ -166,3 +166,59 @@ export function notifyInquiryStatusChange(
 
   sendEmailAsync({ to: email, subject, html });
 }
+
+interface ShopOrderSubmission {
+  fullName: string;
+  email: string;
+  phone: string;
+  notes?: string;
+  items: {
+    productName: string;
+    category: string;
+    color: string;
+    size: string;
+    quantity: number;
+  }[];
+}
+
+export function notifyShopOrder(data: ShopOrderSubmission): void {
+  const itemSummary = data.items
+    .map(
+      (item) =>
+        `${item.quantity}x ${item.productName} (${item.category}) — ${item.color}, size ${item.size}`,
+    )
+    .join('\n');
+
+  const userEmail = renderSubmissionReceivedEmail({
+    type: 'contact',
+    recipientName: data.fullName,
+    summaryRows: [
+      { label: 'Items', value: `${data.items.length} product line(s)` },
+      { label: 'Phone', value: data.phone },
+    ],
+  });
+
+  sendEmailAsync({
+    to: data.email,
+    subject: '[CBFC] Shop order received',
+    html: userEmail.html,
+  });
+
+  const adminEmail = renderAdminNotificationEmail({
+    type: 'contact',
+    detailRows: [
+      { label: 'Customer', value: data.fullName },
+      { label: 'Email', value: data.email },
+      { label: 'Phone', value: data.phone },
+      { label: 'Items', value: `${data.items.length} line(s)` },
+    ],
+    messagePreview: [itemSummary, data.notes ? `Notes: ${data.notes}` : ''].filter(Boolean).join('\n\n'),
+  });
+
+  sendEmailAsync({
+    to: getAdminNotificationEmail(),
+    subject: '[CBFC] New shop order — please log in to review',
+    html: adminEmail.html,
+    replyTo: data.email,
+  });
+}

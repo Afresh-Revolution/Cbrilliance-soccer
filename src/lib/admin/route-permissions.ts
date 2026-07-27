@@ -6,7 +6,11 @@ export function requiredPermissionForAdminPath(pathname: string): string | null 
 
   if (path.startsWith('/admin/settings')) return 'admin.settings';
 
-  if (path.startsWith('/admin/applications') || path.startsWith('/admin/inquiries')) {
+  if (
+    path.startsWith('/admin/applications') ||
+    path.startsWith('/admin/inquiries') ||
+    path.startsWith('/admin/shop-orders')
+  ) {
     return 'inquiries.read';
   }
 

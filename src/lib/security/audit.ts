@@ -11,6 +11,8 @@ export type AuditAction =
   | 'form.contact'
   | 'form.academy'
   | 'form.scout'
+  | 'form.shop_order'
+  | 'shop_order.update'
   | 'admin.access_denied'
   | 'player.create'
   | 'player.update'

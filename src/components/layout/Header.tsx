@@ -9,6 +9,7 @@ import { CBFC_MEDIA } from '@/lib/data/cbfc-media';
 import Button from '@/components/common/Button';
 import MenuBallToggle from '@/components/layout/MenuBallToggle';
 import MobileNavDrawer from '@/components/layout/MobileNavDrawer';
+import ShopCartButton from '@/components/shop/ShopCartButton';
 
 function isNavLinkActive(pathname: string, hash: string, href: string): boolean {
   if (href.includes('#')) {
@@ -79,6 +80,7 @@ export default function Header() {
           </nav>
 
           <div className="header__actions">
+            <ShopCartButton />
             <Button href="/academy#register" variant="primary" size="sm" className="header__cta">
               Join CBFC
             </Button>
