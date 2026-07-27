@@ -10,7 +10,7 @@ import { getCountryCode } from '@/lib/constants/countries';
 
 interface Props {
   player: Player;
-  whatsapp: string;
+  whatsapp?: string | null;
 }
 
 export default function PlayerProfileView({ player, whatsapp }: Props) {
@@ -122,12 +122,14 @@ export default function PlayerProfileView({ player, whatsapp }: Props) {
         <div className="player-profile-v2__cta-row">
             <Button href={`/agency?player=${player.slug}`} variant="primary">Request Player</Button>
             <Button href="/agency" variant="outline">Contact Agency</Button>
-            <Button
-              href={`https://wa.me/${whatsapp}?text=Interested in ${player.fullName}`}
-              variant="ghost"
-            >
-              WhatsApp
-            </Button>
+            {whatsapp ? (
+              <Button
+                href={`https://wa.me/${whatsapp}?text=Interested in ${player.fullName}`}
+                variant="ghost"
+              >
+                WhatsApp
+              </Button>
+            ) : null}
         </div>
       </div>
 

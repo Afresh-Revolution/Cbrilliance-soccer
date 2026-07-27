@@ -10,10 +10,21 @@ import Button from '@/components/common/Button';
 import MenuBallToggle from '@/components/layout/MenuBallToggle';
 import MobileNavDrawer from '@/components/layout/MobileNavDrawer';
 
+function isNavLinkActive(pathname: string, hash: string, href: string): boolean {
+  if (href.includes('#')) {
+    const [path, fragment] = href.split('#');
+    const base = path || '/';
+    return pathname === base && hash === `#${fragment}`;
+  }
+  if (href === '/') return pathname === '/' && !hash;
+  return pathname === href;
+}
+
 export default function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hash, setHash] = useState('');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -23,6 +34,13 @@ export default function Header() {
 
   useEffect(() => {
     setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const syncHash = () => setHash(window.location.hash);
+    syncHash();
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
   }, [pathname]);
 
   const isHome = pathname === '/';
@@ -53,7 +71,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`header__link ${pathname === link.href ? 'header__link--active' : ''}`}
+                className={`header__link ${isNavLinkActive(pathname, hash, link.href) ? 'header__link--active' : ''}`}
               >
                 {link.label}
               </Link>

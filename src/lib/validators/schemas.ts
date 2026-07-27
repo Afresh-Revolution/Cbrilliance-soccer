@@ -214,11 +214,20 @@ export const adminGalleryPatchSchema = adminGallerySchema.partial();
 
 export const shopCategoryEnum = z.enum(['jerseys', 'shorts', 'socks', 'boots']);
 
+export const shopColorOptionSchema = z.object({
+  name: z.string().min(1).max(40),
+  hex: z
+    .string()
+    .regex(/^#([0-9A-Fa-f]{6})$/, 'Use a hex color like #C8A75D'),
+});
+
 export const adminShopProductSchema = z.object({
   name: z.string().min(1, 'Name is required').max(120),
   description: z.string().max(500).optional(),
   imageUrl: safeMediaUrlSchema.refine((value) => value.trim().length > 0, 'Product image is required'),
   category: shopCategoryEnum,
+  colors: z.array(shopColorOptionSchema).max(12).default([]),
+  sizes: z.array(z.string().min(1).max(20)).max(20).default([]),
   sortOrder: z.coerce.number().int().min(0).optional(),
 });
 

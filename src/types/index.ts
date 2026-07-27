@@ -221,12 +221,19 @@ export interface GalleryItem {
 
 export type ShopCategory = 'jerseys' | 'shorts' | 'socks' | 'boots';
 
+export interface ShopColorOption {
+  name: string;
+  hex: string;
+}
+
 export interface ShopProduct {
   id: string;
   name: string;
   description?: string;
   imageUrl: string;
   category: ShopCategory;
+  colors: ShopColorOption[];
+  sizes: string[];
   sortOrder: number;
 }
 

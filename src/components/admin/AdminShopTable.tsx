@@ -82,6 +82,8 @@ export default function AdminShopTable({ products: initialProducts }: { products
               <th>Image</th>
               <th>Name</th>
               <th>Category</th>
+              <th>Colors</th>
+              <th>Sizes</th>
               <th>Order</th>
               <th>Actions</th>
             </tr>
@@ -89,7 +91,7 @@ export default function AdminShopTable({ products: initialProducts }: { products
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td colSpan={5} className="admin__table-empty">
+                <td colSpan={7} className="admin__table-empty">
                   No shop items yet. Upload jerseys, shorts, socks, or boots for the Shop Now section.
                 </td>
               </tr>
@@ -114,6 +116,8 @@ export default function AdminShopTable({ products: initialProducts }: { products
                   </td>
                   <td>{item.name}</td>
                   <td>{shopCategoryLabel(item.category)}</td>
+                  <td>{item.colors?.length ? item.colors.map((c) => c.name).join(', ') : '—'}</td>
+                  <td>{item.sizes?.length ? item.sizes.join(', ') : '—'}</td>
                   <td>{item.sortOrder ?? 0}</td>
                   <td>
                     <div className="admin-videos__actions">

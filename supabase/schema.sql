@@ -5,7 +5,7 @@
 --         contact_inquiries, news_articles, videos, club_staff, fixtures,
 --         gallery_items, shop_products, activity_items, site_stats, club_stats, audit_logs
 --
--- Existing projects: run migrations in order (002 → 009) instead.
+-- Existing projects: run migrations in order (002 → 010) instead.
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -166,6 +166,8 @@ CREATE TABLE IF NOT EXISTS shop_products (
   description TEXT,
   image_url TEXT NOT NULL,
   category TEXT NOT NULL CHECK (category IN ('jerseys', 'shorts', 'socks', 'boots')),
+  colors JSONB NOT NULL DEFAULT '[]'::jsonb,
+  sizes TEXT[] NOT NULL DEFAULT '{}',
   sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

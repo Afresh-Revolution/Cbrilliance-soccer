@@ -12,13 +12,31 @@ interface Props {
   onClose: () => void;
 }
 
+function isNavLinkActive(pathname: string, hash: string, href: string): boolean {
+  if (href.includes('#')) {
+    const [path, fragment] = href.split('#');
+    const base = path || '/';
+    return pathname === base && hash === `#${fragment}`;
+  }
+  if (href === '/') return pathname === '/' && !hash;
+  return pathname === href;
+}
+
 export default function MobileNavDrawer({ open, onClose }: Props) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [hash, setHash] = useState('');
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const syncHash = () => setHash(window.location.hash);
+    syncHash();
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -61,7 +79,7 @@ export default function MobileNavDrawer({ open, onClose }: Props) {
             <Link
               key={link.href}
               href={link.href}
-              className={`mobile-nav__link ${pathname === link.href ? 'mobile-nav__link--active' : ''}`}
+              className={`mobile-nav__link ${isNavLinkActive(pathname, hash, link.href) ? 'mobile-nav__link--active' : ''}`}
               onClick={onClose}
             >
               {link.label}

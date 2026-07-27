@@ -23,7 +23,8 @@ export default async function PlayerProfilePage({ params }: Props) {
   const player = await getPlayerBySlug(slug);
   if (!player) notFound();
 
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '1234567890';
+  const { getPlayerWhatsAppNumber } = await import('@/lib/constants/contact');
+  const whatsapp = getPlayerWhatsAppNumber();
 
   return <PlayerProfileView player={player} whatsapp={whatsapp} />;
 }

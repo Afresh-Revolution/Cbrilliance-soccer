@@ -4,6 +4,7 @@ export const NAV_LINKS = [
   { href: '/players', label: 'Players' },
   { href: '/agency', label: 'Agency' },
   { href: '/club', label: 'Professional Club' },
+  { href: '/#shop', label: 'Shop Now' },
   { href: '/video-hub', label: 'Video Hub' },
   { href: '/player-movement', label: 'Player Movement' },
   { href: '/news', label: 'News' },
@@ -18,6 +19,7 @@ export const FOOTER_LINKS = {
   ],
   quick: [
     { href: '/players', label: 'Players' },
+    { href: '/#shop', label: 'Shop Now' },
     { href: '/video-hub', label: 'Video Hub' },
     { href: '/player-movement', label: 'Player Movement' },
     { href: '/news', label: 'News' },

@@ -1,28 +1,58 @@
 import type { ShopCategory, ShopProduct } from '@/types';
 import type { AdminShopProductInput } from './shop-shared';
+import {
+  DEFAULT_SHOP_COLORS,
+  defaultSizesForCategory,
+  parseShopColors,
+  parseShopSizes,
+} from './shop-shared';
 import { isSupabaseApiConfigured } from '@/lib/db/env';
 import { canonicalMediaStorageUrl } from './cbfc-media';
 
 export type { AdminShopProductInput, ShopProductRecord } from './shop-shared';
-export { shopProductToFormValues, SHOP_CATEGORIES, shopCategoryLabel } from './shop-shared';
+export {
+  shopProductToFormValues,
+  SHOP_CATEGORIES,
+  shopCategoryLabel,
+  DEFAULT_SHOP_COLORS,
+  DEFAULT_APPAREL_SIZES,
+  DEFAULT_BOOT_SIZES,
+  defaultSizesForCategory,
+} from './shop-shared';
 
 function mapDbProduct(row: Record<string, unknown>): ShopProduct {
+  const category = (row.category as ShopCategory) || 'jerseys';
+  const colors = parseShopColors(row.colors);
+  const sizes = parseShopSizes(row.sizes);
+
   return {
     id: row.id as string,
     name: (row.name as string) || '',
     description: (row.description as string) || undefined,
     imageUrl: (row.image_url as string) || '',
-    category: (row.category as ShopCategory) || 'jerseys',
+    category,
+    colors: colors.length ? colors : [...DEFAULT_SHOP_COLORS],
+    sizes: sizes.length ? sizes : defaultSizesForCategory(category),
     sortOrder: (row.sort_order as number) ?? 0,
   };
 }
 
 function toDbRow(input: AdminShopProductInput) {
+  const colors = (input.colors ?? []).map((color) => ({
+    name: color.name.trim(),
+    hex: color.hex.trim().toUpperCase(),
+  }));
+  const sizes = (input.sizes ?? [])
+    .map((size) => size.trim())
+    .filter(Boolean);
+
   return {
     name: input.name.trim(),
     description: input.description?.trim() || null,
     image_url: canonicalMediaStorageUrl(input.imageUrl),
     category: input.category,
+    colors,
+    sizes,
     sort_order: input.sortOrder ?? 0,
   };
 }
@@ -95,6 +125,15 @@ export async function updateShopProduct(
   if (input.description !== undefined) patch.description = input.description.trim() || null;
   if (input.imageUrl !== undefined) patch.image_url = canonicalMediaStorageUrl(input.imageUrl);
   if (input.category !== undefined) patch.category = input.category;
+  if (input.colors !== undefined) {
+    patch.colors = input.colors.map((color) => ({
+      name: color.name.trim(),
+      hex: color.hex.trim().toUpperCase(),
+    }));
+  }
+  if (input.sizes !== undefined) {
+    patch.sizes = input.sizes.map((size) => size.trim()).filter(Boolean);
+  }
   if (input.sortOrder !== undefined) patch.sort_order = input.sortOrder;
 
   const supabase = await getServiceSupabase();

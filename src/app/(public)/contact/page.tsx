@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import Button from '@/components/common/Button';
 import { postPublicForm } from '@/lib/auth/public-form-client';
-import { getPublicContactEmail } from '@/lib/constants/contact';
+import {
+  getPublicContactEmail,
+  getPublicContactPhone,
+  getWhatsAppNumber,
+  SOCIAL_LINKS,
+} from '@/lib/constants/contact';
 
 export default function ContactPage() {
   const [formState, setFormState] = useState({ loading: false, success: false, error: '' });
@@ -24,8 +29,8 @@ export default function ContactPage() {
   }
 
   const email = getPublicContactEmail();
-  const phone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1234567890';
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '1234567890';
+  const phone = getPublicContactPhone();
+  const whatsapp = getWhatsAppNumber();
 
   return (
     <>
@@ -101,6 +106,24 @@ export default function ContactPage() {
                 <div>
                   <p className="contact-info__label">Office Address</p>
                   <p>CBFC Headquarters, Football District, Lagos, Nigeria</p>
+                </div>
+              </div>
+              <div className="contact-info__item">
+                <div className="contact-info__icon">SM</div>
+                <div>
+                  <p className="contact-info__label">Social Media</p>
+                  <div className="contact-info__social">
+                    {SOCIAL_LINKS.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {link.ariaLabel}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

@@ -41,6 +41,22 @@
     color: $color-muted-gray;
     margin-bottom: $spacing-xs;
   }
+
+  &__social {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    a {
+      font-size: 0.875rem;
+      color: $color-soft-light;
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $color-premium-gold;
+      }
+    }
+  }
 }
 
 .map-placeholder {

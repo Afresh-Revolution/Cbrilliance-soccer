@@ -1,9 +1,14 @@
 import Link from 'next/link';
 import { FOOTER_LINKS } from '@/lib/constants/navigation';
-import { getPublicContactEmail } from '@/lib/constants/contact';
+import {
+  getPublicContactEmail,
+  getPublicContactPhone,
+  SOCIAL_LINKS,
+} from '@/lib/constants/contact';
 
 export default function Footer() {
   const supportEmail = getPublicContactEmail();
+  const supportPhone = getPublicContactPhone();
 
   return (
     <footer className="footer">
@@ -46,9 +51,7 @@ export default function Footer() {
                 <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
               </li>
               <li>
-                <a href={`tel:${process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1234567890'}`}>
-                  {process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1234567890'}
-                </a>
+                <a href={`tel:${supportPhone}`}>{supportPhone}</a>
               </li>
               <li>
                 <Link href="/contact">Get In Touch</Link>
@@ -64,10 +67,17 @@ export default function Footer() {
             . All rights reserved.
           </p>
           <div className="footer__social">
-            <a href="#" aria-label="Instagram">IG</a>
-            <a href="#" aria-label="Twitter">X</a>
-            <a href="#" aria-label="YouTube">YT</a>
-            <a href="#" aria-label="LinkedIn">IN</a>
+            {SOCIAL_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={link.ariaLabel}
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </div>
       </div>

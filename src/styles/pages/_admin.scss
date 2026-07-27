@@ -1813,6 +1813,82 @@
   }
 }
 
+.admin-shop {
+  &__colors {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  &__color-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: 0.875rem;
+
+    code {
+      color: $color-muted-gray;
+      font-size: 0.75rem;
+    }
+  }
+
+  &__color-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba($color-white, 0.25);
+    flex-shrink: 0;
+  }
+
+  &__add-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    align-items: center;
+  }
+
+  &__hex-input {
+    width: 3.25rem;
+    min-width: 3.25rem;
+    padding: 0.2rem;
+    height: 2.5rem;
+  }
+
+  &__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-md;
+  }
+
+  &__size-chip {
+    appearance: none;
+    min-width: 2.5rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid $color-border-gray;
+    background: transparent;
+    color: $color-soft-light;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &--active {
+      border-color: $color-premium-gold;
+      background: rgba($color-premium-gold, 0.16);
+      color: $color-light-gold;
+    }
+  }
+
+  &__hint {
+    margin: $spacing-sm 0 0;
+    font-size: 0.8125rem;
+    color: $color-muted-gray;
+  }
+}
+
 .admin-login {
   position: relative;
   min-height: 100vh;
