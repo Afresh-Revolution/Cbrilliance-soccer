@@ -4,10 +4,10 @@ import { useState } from 'react';
 import Button from '@/components/common/Button';
 import { postPublicForm } from '@/lib/auth/public-form-client';
 import {
-  getPublicContactEmail,
-  getPublicContactPhone,
-  getWhatsAppNumber,
   SOCIAL_LINKS,
+  SUPPORT_EMAIL,
+  SUPPORT_PHONE,
+  WHATSAPP_NUMBER,
 } from '@/lib/constants/contact';
 
 export default function ContactPage() {
@@ -28,9 +28,9 @@ export default function ContactPage() {
     }
   }
 
-  const email = getPublicContactEmail();
-  const phone = getPublicContactPhone();
-  const whatsapp = getWhatsAppNumber();
+  const email = SUPPORT_EMAIL;
+  const phone = SUPPORT_PHONE;
+  const whatsapp = WHATSAPP_NUMBER;
 
   return (
     <>

@@ -1,14 +1,12 @@
 import Link from 'next/link';
 import { FOOTER_LINKS } from '@/lib/constants/navigation';
 import {
-  getPublicContactEmail,
-  getPublicContactPhone,
   SOCIAL_LINKS,
+  SUPPORT_EMAIL,
+  SUPPORT_PHONE,
 } from '@/lib/constants/contact';
 
 export default function Footer() {
-  const supportEmail = getPublicContactEmail();
-  const supportPhone = getPublicContactPhone();
 
   return (
     <footer className="footer">
@@ -48,10 +46,10 @@ export default function Footer() {
             <h4>Contact</h4>
             <ul>
               <li>
-                <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
+                <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
               </li>
               <li>
-                <a href={`tel:${supportPhone}`}>{supportPhone}</a>
+                <a href={`tel:${SUPPORT_PHONE}`}>{SUPPORT_PHONE}</a>
               </li>
               <li>
                 <Link href="/contact">Get In Touch</Link>
