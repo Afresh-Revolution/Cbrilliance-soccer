@@ -330,6 +330,38 @@ export async function updateTournamentBankDetails(
   return mapBankDetails(data);
 }
 
+export async function deleteTournamentRegistration(id: string): Promise<TournamentRegistration> {
+  if (!isSupabaseServiceConfigured()) throw new Error('DATABASE_NOT_CONFIGURED');
+
+  const existing = await getTournamentRegistrationById(id);
+  if (!existing) throw new Error('NOT_FOUND');
+
+  const supabase = await getServiceSupabase();
+
+  // Approved and rejected squads block player deletes. Clear that lock first
+  // so the registration and every player row can be removed.
+  if (isSquadLocked(existing.status)) {
+    const { error: unlockError } = await supabase
+      .from('tournament_registrations')
+      .update({ status: 'submitted' })
+      .eq('id', id);
+    if (unlockError) throw new Error(unlockError.message);
+  }
+
+  const { error: playersError } = await supabase
+    .from('tournament_players')
+    .delete()
+    .eq('registration_id', id);
+  if (playersError) {
+    throw new Error(playersError.message.includes('SQUAD_LOCKED') ? 'SQUAD_LOCKED' : playersError.message);
+  }
+
+  const { error } = await supabase.from('tournament_registrations').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+
+  return existing;
+}
+
 export async function updateTournamentRegistrationStatus(
   id: string,
   status: TournamentRegistrationStatus,

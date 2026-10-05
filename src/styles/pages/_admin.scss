@@ -1732,8 +1732,41 @@
 
 .admin-tournament-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 8.25rem;
+
+  .btn {
+    width: 100%;
+    min-height: 2rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: $radius-md;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  &__delete {
+    border-color: rgba($color-danger, 0.5);
+    color: #fca5a5;
+
+    &:hover:not(:disabled) {
+      background: rgba($color-danger, 0.16);
+      border-color: rgba($color-danger, 0.7);
+      color: $color-white;
+    }
+  }
+}
+
+.admin-tournament-table {
+  td:last-child {
+    width: 1%;
+    vertical-align: middle;
+  }
+
+  &__date {
+    white-space: nowrap;
+  }
 }
 
 .admin-tournament-detail {

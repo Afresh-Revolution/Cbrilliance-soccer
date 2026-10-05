@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
 import type { TournamentRegistration, TournamentRegistrationStatus } from '@/types';
 import { TOURNAMENT_STATUS_LABELS } from '@/lib/constants/navigation';
-import { fetchCsrfToken, patchWithCsrf, postWithCsrf } from '@/lib/auth/csrf-client';
+import { deleteWithCsrf, fetchCsrfToken, patchWithCsrf, postWithCsrf } from '@/lib/auth/csrf-client';
 
 const STATUS_OPTIONS: TournamentRegistrationStatus[] = [
   'submitted',
@@ -31,6 +32,8 @@ export default function AdminTournamentTable({
   const [registrations, setRegistrations] = useState(initialRegistrations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [resendId, setResendId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<TournamentRegistration | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const submittedCount = registrations.filter((registration) => registration.status === 'submitted').length;
 
@@ -51,6 +54,36 @@ export default function AdminTournamentTable({
       router.refresh();
     } catch {
       alert('Failed to update status');
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+
+    const registration = deleteTarget;
+    setBusyId(registration.id);
+    setDeleteError(null);
+    try {
+      const csrf = await fetchCsrfToken();
+      const { ok, data } = await deleteWithCsrf<{ error?: string }>(
+        `/api/admin/tournament/${registration.id}`,
+        csrf,
+      );
+      if (!ok) {
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Could not delete this registration.');
+        return;
+      }
+      setRegistrations((current) => current.filter((item) => item.id !== registration.id));
+      setDeleteTarget(null);
+      setNotice({
+        type: 'success',
+        text: `${registration.registrationCode} was permanently deleted.`,
+      });
+      router.refresh();
+    } catch {
+      setDeleteError('Could not delete this registration.');
     } finally {
       setBusyId(null);
     }
@@ -95,7 +128,7 @@ export default function AdminTournamentTable({
         <div className={notice.type === 'success' ? 'form__success' : 'form__error'}>{notice.text}</div>
       )}
       <div className="admin__table-wrap">
-        <table className="admin__table">
+        <table className="admin__table admin-tournament-table">
           <thead>
             <tr>
               <th>Registration ID</th>
@@ -121,7 +154,7 @@ export default function AdminTournamentTable({
                   <td>{registration.teamName}</td>
                   <td>{registration.officialFullName}</td>
                   <td>{registration.players.length}/{registration.playerCount}</td>
-                  <td>{formatDate(registration.createdAt)}</td>
+                  <td className="admin-tournament-table__date">{formatDate(registration.createdAt)}</td>
                   <td>
                     <select
                       className="admin-applications__status-select"
@@ -144,8 +177,20 @@ export default function AdminTournamentTable({
                         className="btn btn--outline btn--sm"
                         onClick={() => resendEmail(registration)}
                         disabled={resendId === registration.id || !registration.officialEmail}
+                        title={registration.officialEmail ? 'Resend the registration email' : 'No email address on this registration'}
                       >
-                        {resendId === registration.id ? 'Sending…' : 'Resend email'}
+                        {resendId === registration.id ? 'Sending…' : 'Resend'}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn--outline btn--sm admin-tournament-actions__delete"
+                        onClick={() => {
+                          setDeleteError(null);
+                          setDeleteTarget(registration);
+                        }}
+                        disabled={busyId === registration.id}
+                      >
+                        Delete
                       </button>
                     </div>
                   </td>
@@ -155,6 +200,22 @@ export default function AdminTournamentTable({
           </tbody>
         </table>
       </div>
+
+      {deleteTarget && (
+        <AdminConfirmDialog
+          title="Delete registration?"
+          message={`${deleteTarget.registrationCode} for ${deleteTarget.teamName} will be permanently removed, including every squad player. This cannot be undone.`}
+          confirmLabel="Delete registration"
+          busy={busyId === deleteTarget.id}
+          error={deleteError}
+          onCancel={() => {
+            if (busyId) return;
+            setDeleteTarget(null);
+            setDeleteError(null);
+          }}
+          onConfirm={confirmDelete}
+        />
+      )}
     </>
   );
 }

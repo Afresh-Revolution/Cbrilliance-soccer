@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
-import { fetchCsrfToken, postWithCsrf } from '@/lib/auth/csrf-client';
+import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog';
+import { deleteWithCsrf, fetchCsrfToken, postWithCsrf } from '@/lib/auth/csrf-client';
 import { TOURNAMENT_POSITION_LABELS, TOURNAMENT_STATUS_LABELS } from '@/lib/constants/navigation';
 import { formatNaira } from '@/lib/tournament/constants';
 import type { TournamentRegistration } from '@/types';
@@ -20,12 +22,38 @@ export default function AdminTournamentDetail({
 }: {
   registration: TournamentRegistration;
 }) {
-  const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  const [resendBusy, setResendBusy] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const [sentTo, setSentTo] = useState('');
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function confirmDelete() {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const csrf = await fetchCsrfToken();
+      const { ok, data } = await deleteWithCsrf<{ error?: string }>(
+        `/api/admin/tournament/${registration.id}`,
+        csrf,
+      );
+      if (!ok) {
+        setDeleteError(typeof data.error === 'string' ? data.error : 'Could not delete this registration.');
+        return;
+      }
+      router.push('/admin/tournament');
+      router.refresh();
+    } catch {
+      setDeleteError('Could not delete this registration.');
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   async function resendEmail() {
-    setBusy(true);
+    setResendBusy(true);
     setError('');
     setSentTo('');
     try {
@@ -43,7 +71,7 @@ export default function AdminTournamentDetail({
     } catch {
       setError('Could not resend the email.');
     } finally {
-      setBusy(false);
+      setResendBusy(false);
     }
   }
 
@@ -67,9 +95,20 @@ export default function AdminTournamentDetail({
             type="button"
             className="btn btn--primary btn--sm"
             onClick={resendEmail}
-            disabled={busy || !registration.officialEmail}
+            disabled={resendBusy || deleting || !registration.officialEmail}
           >
-            {busy ? 'Sending…' : 'Resend email'}
+            {resendBusy ? 'Sending…' : 'Resend email'}
+          </button>
+          <button
+            type="button"
+            className="btn btn--outline btn--sm admin-tournament-actions__delete"
+            onClick={() => {
+              setDeleteError(null);
+              setConfirmingDelete(true);
+            }}
+            disabled={resendBusy || deleting}
+          >
+            Delete
           </button>
         </div>
       </header>
@@ -162,6 +201,22 @@ export default function AdminTournamentDetail({
           )}
         </section>
       </div>
+
+      {confirmingDelete && (
+        <AdminConfirmDialog
+          title="Delete registration?"
+          message={`${registration.registrationCode} for ${registration.teamName} will be permanently removed, including every squad player. This cannot be undone.`}
+          confirmLabel="Delete registration"
+          busy={deleting}
+          error={deleteError}
+          onCancel={() => {
+            if (deleting) return;
+            setConfirmingDelete(false);
+            setDeleteError(null);
+          }}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 }

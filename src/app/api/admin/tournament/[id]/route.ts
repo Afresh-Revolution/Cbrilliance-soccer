@@ -4,7 +4,10 @@ import { requirePermission } from '@/lib/auth/rbac';
 import { guardAuthMutation, handleAuthError, rejectInvalidUuid } from '@/lib/security/api-guard';
 import { writeAuditLog } from '@/lib/security/audit';
 import { tournamentStatusSchema } from '@/lib/validators/schemas';
-import { updateTournamentRegistrationStatus } from '@/lib/data/tournament';
+import {
+  deleteTournamentRegistration,
+  updateTournamentRegistrationStatus,
+} from '@/lib/data/tournament';
 import { notifyTournamentStatusChange } from '@/lib/email/notifications';
 import { tournamentErrorResponse } from '@/lib/tournament/errors';
 
@@ -48,6 +51,47 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     });
 
     return NextResponse.json({ registration });
+  } catch (error) {
+    if (error instanceof Error && (
+      error.message === 'DATABASE_NOT_CONFIGURED' ||
+      error.message === 'UNAUTHORIZED' ||
+      error.message === 'FORBIDDEN'
+    )) {
+      if (error.message === 'DATABASE_NOT_CONFIGURED') {
+        return NextResponse.json({ error: 'Database is not configured' }, { status: 503 });
+      }
+      return handleAuthError(error);
+    }
+    const mapped = tournamentErrorResponse(error);
+    return NextResponse.json({ error: mapped.message }, { status: mapped.status });
+  }
+}
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  const blocked = await guardAuthMutation(request, 'admin-tournament-delete', 30, 60 * 60 * 1000);
+  if (blocked) return blocked;
+
+  try {
+    const ctx = await requireAuthContext();
+    requirePermission(ctx, 'inquiries.update');
+
+    const { id } = await context.params;
+    const invalid = rejectInvalidUuid(id);
+    if (invalid) return invalid;
+
+    const registration = await deleteTournamentRegistration(id);
+
+    await writeAuditLog({
+      action: 'tournament.delete',
+      actorId: ctx.userId,
+      actorEmail: ctx.email,
+      resource: 'tournament_registrations',
+      resourceId: registration.id,
+      request,
+      metadata: { registrationCode: registration.registrationCode },
+    });
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof Error && (
       error.message === 'DATABASE_NOT_CONFIGURED' ||
