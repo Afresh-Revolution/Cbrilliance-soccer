@@ -53,85 +53,115 @@ export default function AdminTournamentDetail({
 
   return (
     <div className="admin-tournament-detail">
-      <Button href="/admin/tournament" variant="outline" size="sm">← Back</Button>
+      <header className="admin-tournament-detail__top">
+        <div>
+          <Button href="/admin/tournament" variant="outline" size="sm">← Back</Button>
+          <p className="admin-tournament-detail__code">{registration.registrationCode}</p>
+          <h1>{registration.teamName}</h1>
+        </div>
+        <div className="admin-tournament-detail__actions">
+          <span className="admin-tournament-detail__status">
+            {TOURNAMENT_STATUS_LABELS[registration.status]}
+          </span>
+          <button
+            type="button"
+            className="btn btn--primary btn--sm"
+            onClick={resendEmail}
+            disabled={busy || !registration.officialEmail}
+          >
+            {busy ? 'Sending…' : 'Resend email'}
+          </button>
+        </div>
+      </header>
 
-      <div className="admin__header">
-        <h1>{registration.teamName}</h1>
-        <p className="text-muted">{registration.registrationCode}</p>
-      </div>
-
-      <div className="admin-tournament-detail__actions">
-        <button
-          type="button"
-          className="btn btn--primary btn--sm"
-          onClick={resendEmail}
-          disabled={busy || !registration.officialEmail}
-        >
-          {busy ? 'Sending…' : 'Resend email'}
-        </button>
-        {!registration.officialEmail && (
-          <p className="text-muted">This registration has no email address.</p>
-        )}
-      </div>
       {error && <div className="form__error">{error}</div>}
       {sentTo && <div className="form__success">Registration email sent again to {sentTo}.</div>}
-
-      <dl className="admin-tournament-detail__grid">
-        <div><dt>Status</dt><dd>{TOURNAMENT_STATUS_LABELS[registration.status]}</dd></div>
-        <div><dt>Submitted</dt><dd>{formatDate(registration.createdAt)}</dd></div>
-        <div><dt>Short name</dt><dd>{registration.teamShortName || '—'}</dd></div>
-        <div><dt>Location</dt><dd>{registration.teamLocation}</dd></div>
-        <div><dt>Home ground</dt><dd>{registration.homeGround || '—'}</dd></div>
-        <div><dt>Official</dt><dd>{registration.officialFullName}</dd></div>
-        <div><dt>Phone</dt><dd>{registration.officialPhone}</dd></div>
-        <div><dt>WhatsApp</dt><dd>{registration.officialWhatsapp || '—'}</dd></div>
-        <div><dt>Email</dt><dd>{registration.officialEmail || '—'}</dd></div>
-        <div><dt>Position</dt><dd>{positions || '—'}</dd></div>
-        <div><dt>Declared players</dt><dd>{registration.playerCount}</dd></div>
-        <div><dt>Squad added</dt><dd>{registration.players.length}/{registration.playerCount}</dd></div>
-        <div><dt>Captain</dt><dd>{registration.teamCaptain || '—'}</dd></div>
-        <div><dt>Coach</dt><dd>{registration.coachName || '—'}</dd></div>
-        <div><dt>Assistant coach</dt><dd>{registration.assistantCoach || '—'}</dd></div>
-        <div><dt>Home jersey</dt><dd>{registration.jerseyHome}</dd></div>
-        <div><dt>Away jersey</dt><dd>{registration.jerseyAway || '—'}</dd></div>
-        <div><dt>Representative</dt><dd>{registration.representativeName}</dd></div>
-        <div><dt>Signature</dt><dd>{registration.digitalSignature}</dd></div>
-        <div><dt>Fee</dt><dd>{formatNaira(registration.registrationFeeAmount)}</dd></div>
-        <div><dt>Payment reference</dt><dd>{registration.paymentReference}</dd></div>
-      </dl>
-
-      <div className="admin-tournament-detail__links">
-        {registration.teamLogoUrl && (
-          <a href={registration.teamLogoUrl} target="_blank" rel="noreferrer">View team logo</a>
-        )}
-        {registration.paymentReceiptUrl && (
-          <a href={registration.paymentReceiptUrl} target="_blank" rel="noreferrer">View payment receipt</a>
-        )}
-      </div>
-
-      <h2>Squad ({registration.players.length})</h2>
-      {registration.players.length === 0 ? (
-        <p className="text-muted">No players added yet.</p>
-      ) : (
-        <div className="admin__table-wrap">
-          <table className="admin__table">
-            <thead>
-              <tr>
-                <th>Number</th>
-                <th>Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {registration.players.map((player) => (
-                <tr key={player.id}>
-                  <td>{player.squadNumber}</td>
-                  <td>{player.fullName}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {!registration.officialEmail && (
+        <p className="text-muted">This registration has no email address, so the confirmation cannot be resent.</p>
       )}
+
+      <div className="admin-tournament-detail__sections">
+        <section className="admin-tournament-detail__card">
+          <h2>Team</h2>
+          <dl className="admin-tournament-detail__grid">
+            <div><dt>Short name</dt><dd>{registration.teamShortName || '—'}</dd></div>
+            <div><dt>Submitted</dt><dd>{formatDate(registration.createdAt)}</dd></div>
+            <div><dt>Location</dt><dd>{registration.teamLocation}</dd></div>
+            <div><dt>Home ground</dt><dd>{registration.homeGround || '—'}</dd></div>
+            <div><dt>Home jersey</dt><dd>{registration.jerseyHome}</dd></div>
+            <div><dt>Away jersey</dt><dd>{registration.jerseyAway || '—'}</dd></div>
+            <div><dt>Captain</dt><dd>{registration.teamCaptain || '—'}</dd></div>
+            <div><dt>Coach</dt><dd>{registration.coachName || '—'}</dd></div>
+            <div className="admin-tournament-detail__wide"><dt>Assistant coach</dt><dd>{registration.assistantCoach || '—'}</dd></div>
+          </dl>
+        </section>
+
+        <section className="admin-tournament-detail__card">
+          <h2>Official</h2>
+          <dl className="admin-tournament-detail__grid">
+            <div><dt>Name</dt><dd>{registration.officialFullName}</dd></div>
+            <div><dt>Position</dt><dd>{positions || '—'}</dd></div>
+            <div>
+              <dt>Phone</dt>
+              <dd><a href={`tel:${registration.officialPhone}`}>{registration.officialPhone}</a></dd>
+            </div>
+            <div>
+              <dt>WhatsApp</dt>
+              <dd>
+                {registration.officialWhatsapp
+                  ? <a href={`https://wa.me/${registration.officialWhatsapp.replace(/\D/g, '')}`}>{registration.officialWhatsapp}</a>
+                  : '—'}
+              </dd>
+            </div>
+            <div className="admin-tournament-detail__wide">
+              <dt>Email</dt>
+              <dd>
+                {registration.officialEmail
+                  ? <a href={`mailto:${registration.officialEmail}`}>{registration.officialEmail}</a>
+                  : '—'}
+              </dd>
+            </div>
+            <div><dt>Representative</dt><dd>{registration.representativeName}</dd></div>
+            <div><dt>Signature</dt><dd>{registration.digitalSignature}</dd></div>
+          </dl>
+        </section>
+
+        <section className="admin-tournament-detail__card">
+          <h2>Payment</h2>
+          <dl className="admin-tournament-detail__grid">
+            <div><dt>Fee</dt><dd>{formatNaira(registration.registrationFeeAmount)}</dd></div>
+            <div><dt>Method</dt><dd>Bank transfer</dd></div>
+            <div className="admin-tournament-detail__wide">
+              <dt>Payment reference</dt>
+              <dd>{registration.paymentReference}</dd>
+            </div>
+          </dl>
+          <div className="admin-tournament-detail__links">
+            {registration.teamLogoUrl && (
+              <a className="btn btn--outline btn--sm" href={registration.teamLogoUrl} target="_blank" rel="noreferrer">Team logo</a>
+            )}
+            {registration.paymentReceiptUrl && (
+              <a className="btn btn--outline btn--sm" href={registration.paymentReceiptUrl} target="_blank" rel="noreferrer">Payment receipt</a>
+            )}
+          </div>
+        </section>
+
+        <section className="admin-tournament-detail__card admin-tournament-detail__card--squad">
+          <h2>Squad · {registration.players.length} of {registration.playerCount}</h2>
+          {registration.players.length === 0 ? (
+            <p className="text-muted">No players added yet.</p>
+          ) : (
+            <ul className="admin-tournament-detail__squad">
+              {registration.players.map((player) => (
+                <li key={player.id}>
+                  <span>{player.squadNumber}</span>
+                  {player.fullName}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

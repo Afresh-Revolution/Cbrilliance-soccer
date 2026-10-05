@@ -10,10 +10,12 @@ export interface SendEmailOptions {
 
 /** Sends email via Resend. Returns false on failure; never throws. */
 export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
-  if (!isResendConfigured()) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[email] RESEND_API_KEY not set — skipping:', options.subject);
-    }
+  const from = getResendFrom();
+  if (!isResendConfigured() || !from) {
+    console.warn(
+      '[email] Set RESEND_API_KEY and RESEND_FROM to a verified domain address. The onboarding@resend.dev default is not used. Skipping:',
+      options.subject,
+    );
     return false;
   }
 
@@ -22,7 +24,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
 
   try {
     const { error } = await client.emails.send({
-      from: getResendFrom(),
+      from,
       to: options.to,
       subject: options.subject,
       html: options.html,

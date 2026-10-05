@@ -1,11 +1,16 @@
 import { SUPPORT_EMAIL, getPublicContactEmail } from '@/lib/constants/contact';
 
-export function isResendConfigured(): boolean {
-  return Boolean(process.env.RESEND_API_KEY?.trim());
+const RESEND_TEST_DOMAIN = '@resend.dev';
+
+/** Sender address from RESEND_FROM. The resend.dev test address is never used. */
+export function getResendFrom(): string | null {
+  const from = process.env.RESEND_FROM?.trim().replace(/^["']|["']$/g, '');
+  if (!from || from.toLowerCase().includes(RESEND_TEST_DOMAIN)) return null;
+  return from;
 }
 
-export function getResendFrom(): string {
-  return process.env.RESEND_FROM?.trim() || 'CBFC <onboarding@resend.dev>';
+export function isResendConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim() && getResendFrom());
 }
 
 export function getSiteUrl(): string {

@@ -63,15 +63,26 @@
 
   &__ctas {
     display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-md;
+    flex-direction: column;
+    gap: $spacing-sm;
     margin-bottom: $spacing-2xl;
-  }
 
-  &__cta-pair {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-md;
+    .btn {
+      width: 100%;
+    }
+
+    @include respond-to('md') {
+      flex-direction: row;
+      align-items: stretch;
+
+      .btn {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+    }
   }
 
   &__pillars {
