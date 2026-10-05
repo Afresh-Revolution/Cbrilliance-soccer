@@ -182,6 +182,20 @@ export async function getAllTournamentRegistrations(): Promise<TournamentRegistr
   return data.map((row) => mapRegistration(row));
 }
 
+export async function getTournamentRegistrationById(id: string): Promise<TournamentRegistration | null> {
+  if (!isSupabaseServiceConfigured()) return null;
+
+  const supabase = await getServiceSupabase();
+  const { data, error } = await supabase
+    .from('tournament_registrations')
+    .select(REGISTRATION_SELECT)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapRegistration(data);
+}
+
 export async function getTournamentRegistrationByToken(token: string): Promise<TournamentSquad | null> {
   if (!isSupabaseServiceConfigured()) return null;
 

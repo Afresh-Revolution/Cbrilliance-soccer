@@ -194,26 +194,35 @@ interface TournamentSubmission {
   location: string;
 }
 
-export function notifyTournamentRegistration(data: TournamentSubmission): void {
-  if (data.email) {
-    const userEmail = renderSubmissionReceivedEmail({
-      type: 'tournament',
-      recipientName: data.officialName,
-      summaryRows: [
-        { label: 'Team', value: data.teamName },
-        { label: 'Registration ID', value: data.registrationCode },
-        { label: 'Squad size', value: String(data.playerCount) },
-      ],
-      ctaLabel: 'Add squad players',
-      ctaHref: data.squadUrl,
-    });
+function sendTournamentTeamEmail(data: TournamentSubmission): boolean {
+  if (!data.email) return false;
 
-    sendEmailAsync({
-      to: data.email,
-      subject: userEmail.subject,
-      html: userEmail.html,
-    });
-  }
+  const userEmail = renderSubmissionReceivedEmail({
+    type: 'tournament',
+    recipientName: data.officialName,
+    summaryRows: [
+      { label: 'Team', value: data.teamName },
+      { label: 'Registration ID', value: data.registrationCode },
+      { label: 'Squad size', value: String(data.playerCount) },
+    ],
+    ctaLabel: 'Add squad players',
+    ctaHref: data.squadUrl,
+  });
+
+  sendEmailAsync({
+    to: data.email,
+    subject: userEmail.subject,
+    html: userEmail.html,
+  });
+  return true;
+}
+
+export function resendTournamentRegistrationEmail(data: TournamentSubmission): boolean {
+  return sendTournamentTeamEmail(data);
+}
+
+export function notifyTournamentRegistration(data: TournamentSubmission): void {
+  sendTournamentTeamEmail(data);
 
   const adminEmail = renderAdminNotificationEmail({
     type: 'tournament',

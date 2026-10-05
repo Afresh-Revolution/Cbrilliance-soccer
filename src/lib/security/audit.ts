@@ -26,6 +26,7 @@ export type AuditAction =
   | 'video.delete'
   | 'application.update'
   | 'tournament.update'
+  | 'tournament.email_resend'
   | 'tournament.bank_details_update'
   | 'inquiry.update'
   | 'inquiry.delete'

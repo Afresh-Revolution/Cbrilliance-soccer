@@ -1730,6 +1730,63 @@
   }
 }
 
+.admin-tournament-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.admin-tournament-detail {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @include respond-to('sm') {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    dt {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: $color-muted-gray;
+      margin-bottom: 2px;
+    }
+
+    dd {
+      margin: 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+
+    a {
+      color: $color-light-gold;
+    }
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+}
+
 .admin-confirm {
   &__panel {
     text-align: center;
