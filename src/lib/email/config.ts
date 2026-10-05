@@ -13,8 +13,32 @@ export function isResendConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY?.trim() && getResendFrom());
 }
 
+const PUBLIC_SITE_URL = 'https://www.cbrilliancefc.com';
+
+function isLocalHostname(hostname: string): boolean {
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname.endsWith('.local')
+  );
+}
+
+/** Public site origin used in emails. Localhost is never sent to recipients. */
 export function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!configured) return PUBLIC_SITE_URL;
+
+  try {
+    const parsed = new URL(configured);
+    if (isLocalHostname(parsed.hostname)) return PUBLIC_SITE_URL;
+    if (parsed.hostname === 'cbrilliancefc.com') {
+      parsed.hostname = 'www.cbrilliancefc.com';
+    }
+    return parsed.origin;
+  } catch {
+    return PUBLIC_SITE_URL;
+  }
 }
 
 /** Inbox that receives alerts when visitors submit forms / requests. */
@@ -27,9 +51,5 @@ export function getAdminNotificationEmail(): string {
 }
 
 export function getLogoUrl(): string {
-  const b2 = process.env.NEXT_PUBLIC_B2_PUBLIC_URL?.replace(/\/$/, '');
-  if (b2 && process.env.NEXT_PUBLIC_USE_B2_MEDIA === 'true') {
-    return `${b2}/cbfc/logo/cbfc-logo.png`;
-  }
   return `${getSiteUrl()}/media/CBFC%20Logo.png`;
 }

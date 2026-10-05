@@ -36,13 +36,21 @@ export function renderEmailLayout(options: EmailLayoutOptions): string {
   const ctaBlock =
     options.ctaLabel && options.ctaHref
       ? `
-        <tr>
-          <td style="padding: 8px 0 28px;">
-            <a href="${escapeHtml(options.ctaHref)}" style="display: inline-block; background: linear-gradient(135deg, ${EMAIL_COLORS.gold}, ${EMAIL_COLORS.lightGold}); color: ${EMAIL_COLORS.midnight}; font-weight: 700; font-size: 14px; text-decoration: none; padding: 14px 28px; border-radius: 8px; letter-spacing: 0.02em;">
-              ${escapeHtml(options.ctaLabel)}
-            </a>
-          </td>
-        </tr>`
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 20px 0 4px;">
+                <tr>
+                  <td align="left" style="padding: 0;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="border-radius: 8px; background-color: ${EMAIL_COLORS.gold};">
+                          <a href="${escapeHtml(options.ctaHref)}" style="display: inline-block; background-color: ${EMAIL_COLORS.gold}; color: ${EMAIL_COLORS.midnight}; font-family: 'DM Sans', 'Segoe UI', sans-serif; font-weight: 700; font-size: 14px; line-height: 1; text-decoration: none; padding: 14px 28px; border-radius: 8px; letter-spacing: 0.02em;">
+                            ${escapeHtml(options.ctaLabel)}
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>`
       : '';
 
   return `<!DOCTYPE html>
@@ -70,7 +78,7 @@ export function renderEmailLayout(options: EmailLayoutOptions): string {
           <tr>
             <td style="padding: 32px 32px 24px; text-align: center; border-bottom: 1px solid ${EMAIL_COLORS.border};">
               <a href="${escapeHtml(siteUrl)}" style="text-decoration: none;">
-                <img src="${escapeHtml(logoUrl)}" alt="CBFC" width="72" height="72" style="display: block; margin: 0 auto 16px; border-radius: 8px;" />
+                <img src="${escapeHtml(logoUrl)}" alt="CBFC" width="72" height="72" border="0" style="display: block; width: 72px; height: 72px; margin: 0 auto 16px; border: 0; border-radius: 8px; outline: none; text-decoration: none;" />
               </a>
               <p style="margin: 0; font-family: 'Syne', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: ${EMAIL_COLORS.gold};">
                 The Innovational Football Club
