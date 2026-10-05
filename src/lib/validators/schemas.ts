@@ -187,6 +187,67 @@ export const adminApplicationStatusSchema = z.object({
   status: applicationStatusEnum,
 });
 
+const requiredCheck = z.preprocess(
+  (value) => value === true || value === 'true' || value === 'on' || value === '1',
+  z.literal(true, { message: 'This agreement is required' }),
+);
+
+const optionalText = z.string().trim().max(160).optional().or(z.literal(''));
+
+export const tournamentOfficialPositionSchema = z.enum([
+  'team_manager',
+  'coach',
+  'team_representative',
+  'club_official',
+]);
+
+export const tournamentRegistrationSchema = z.object({
+  teamName: z.string().trim().min(2, 'Team name is required').max(120),
+  teamShortName: z.string().trim().max(20).optional().or(z.literal('')),
+  teamLocation: z.string().trim().min(2, 'Team location is required').max(120),
+  homeGround: optionalText,
+  officialFullName: z.string().trim().min(2, 'Official name is required').max(120),
+  officialPhone: z.string().trim().min(6, 'Phone number is required').max(30),
+  officialWhatsapp: z.string().trim().max(30).optional().or(z.literal('')),
+  officialEmail: z.union([z.string().trim().email('Enter a valid email'), z.literal('')]).optional(),
+  officialPositions: z.array(tournamentOfficialPositionSchema).min(1, 'Select at least one position').max(4),
+  playerCount: z.coerce.number().int().min(15, 'Minimum squad size is 15').max(18, 'Maximum squad size is 18'),
+  teamCaptain: z.string().trim().max(120).optional().or(z.literal('')),
+  coachName: z.string().trim().max(120).optional().or(z.literal('')),
+  assistantCoach: z.string().trim().max(120).optional().or(z.literal('')),
+  jerseyHome: z.string().trim().min(2, 'Home jersey colour is required').max(40),
+  jerseyAway: z.string().trim().max(40).optional().or(z.literal('')),
+  confirmAccurate: requiredCheck,
+  agreeRules: requiredCheck,
+  understandVerification: requiredCheck,
+  consentMedia: requiredCheck,
+  representativeName: z.string().trim().min(2, 'Representative name is required').max(120),
+  digitalSignature: z.string().trim().min(2, 'Type your full name as a signature').max(120),
+  paymentMethod: z.literal('bank_transfer', { message: 'Select bank transfer' }),
+  paymentReference: z.string().trim().min(3, 'Payment reference is required').max(80),
+});
+
+export const tournamentPlayerSchema = z.object({
+  fullName: z.string().trim().min(2, 'Player name is required').max(120),
+  squadNumber: z.coerce.number().int().min(1, 'Squad number must be at least 1').max(99, 'Squad number must be 99 or less'),
+});
+
+export const tournamentStatusSchema = z.object({
+  status: z.enum(['submitted', 'under_review', 'approved', 'rejected']),
+});
+
+export const tournamentBankDetailsSchema = z.object({
+  bankName: z.string().trim().min(2, 'Bank name is required').max(120),
+  accountName: z.string().trim().min(2, 'Account name is required').max(120),
+  accountNumber: z
+    .string()
+    .trim()
+    .min(6, 'Account number is required')
+    .max(24)
+    .regex(/^[0-9\s-]+$/, 'Account number should contain digits only'),
+  paymentNote: z.string().trim().max(500).optional().or(z.literal('')),
+});
+
 const inquiryStatusEnum = z.enum(['new', 'pending', 'contacted', 'closed']);
 
 export const adminInquiryStatusSchema = z.object({

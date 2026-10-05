@@ -25,6 +25,18 @@ export type ApplicationStatus =
   | 'invited'
   | 'rejected';
 
+export type TournamentOfficialPosition =
+  | 'team_manager'
+  | 'coach'
+  | 'team_representative'
+  | 'club_official';
+
+export type TournamentRegistrationStatus =
+  | 'submitted'
+  | 'under_review'
+  | 'approved'
+  | 'rejected';
+
 export type UserRole = 'super_admin' | 'content_admin' | 'academy_staff';
 
 export type NewsCategory =
@@ -365,6 +377,63 @@ export interface AdminPlayerStatusRow {
   status: PlayerStatus;
   label: string;
   count: number;
+}
+
+export interface TournamentPlayer {
+  id: string;
+  registrationId: string;
+  fullName: string;
+  squadNumber: number;
+  createdAt: string;
+}
+
+export interface TournamentRegistration {
+  id: string;
+  registrationCode: string;
+  accessToken: string;
+  teamName: string;
+  teamShortName?: string;
+  teamLocation: string;
+  homeGround?: string;
+  teamLogoUrl?: string;
+  officialFullName: string;
+  officialPhone: string;
+  officialWhatsapp?: string;
+  officialEmail?: string;
+  officialPositions: TournamentOfficialPosition[];
+  playerCount: number;
+  teamCaptain?: string;
+  coachName?: string;
+  assistantCoach?: string;
+  jerseyHome: string;
+  jerseyAway?: string;
+  representativeName: string;
+  digitalSignature: string;
+  registrationFeeAmount: number;
+  paymentMethod: 'bank_transfer';
+  paymentReference: string;
+  paymentReceiptUrl?: string;
+  status: TournamentRegistrationStatus;
+  createdAt: string;
+  players: TournamentPlayer[];
+}
+
+export interface TournamentBankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  paymentNote: string;
+}
+
+export interface TournamentSquad {
+  registrationCode: string;
+  teamName: string;
+  teamShortName?: string;
+  teamLocation: string;
+  playerCount: number;
+  status: TournamentRegistrationStatus;
+  squadLocked: boolean;
+  players: TournamentPlayer[];
 }
 
 export interface AdminRecentPlayer {

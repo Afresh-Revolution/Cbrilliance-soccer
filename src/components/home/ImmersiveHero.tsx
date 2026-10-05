@@ -64,7 +64,10 @@ export default function ImmersiveHero({ players, stats }: Props) {
 
           <div className="immersive-hero__ctas">
             <Button href="/players" variant="primary" size="lg">Explore Talent</Button>
-            <Button href="/academy" variant="outline" size="lg">Join Academy</Button>
+            <div className="immersive-hero__cta-pair">
+              <Button href="/academy" variant="outline" size="lg">Join Academy</Button>
+              <Button href="/tournament" variant="outline" size="lg">Tournament</Button>
+            </div>
           </div>
 
           <div className="immersive-hero__pillars">

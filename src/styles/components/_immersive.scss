@@ -68,6 +68,12 @@
     margin-bottom: $spacing-2xl;
   }
 
+  &__cta-pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
   &__pillars {
     display: grid;
     gap: $spacing-md;

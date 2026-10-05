@@ -13,6 +13,7 @@ export const ADMIN_NAV_LINKS: AdminNavLink[] = [
   { href: '/admin/news', label: 'News', permission: 'content.read' },
   { href: '/admin/videos', label: 'Videos', permission: 'content.read' },
   { href: '/admin/applications', label: 'Applications', permission: 'inquiries.read' },
+  { href: '/admin/tournament', label: 'Tournament', permission: 'inquiries.read' },
   { href: '/admin/inquiries', label: 'Inquiries', permission: 'inquiries.read' },
   { href: '/admin/staff', label: 'Staff', permission: 'content.read' },
   { href: '/admin/gallery', label: 'Gallery', permission: 'content.read' },

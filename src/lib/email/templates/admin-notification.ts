@@ -27,6 +27,11 @@ const ADMIN_COPY: Record<
     preheader: 'A new scout/agency inquiry has been submitted.',
     adminPath: '/admin/inquiries',
   },
+  tournament: {
+    title: 'New tournament registration',
+    preheader: 'A team has registered for the CBrilliance Football Agency tournament.',
+    adminPath: '/admin/tournament',
+  },
 };
 
 export interface AdminNotificationEmailData {
@@ -77,6 +82,7 @@ export function renderAdminNotificationEmail(data: AdminNotificationEmailData): 
     contact: '[CBFC] New contact enquiry — please log in to review',
     academy: '[CBFC] New academy application — please log in to review',
     scout: '[CBFC] New scout inquiry — please log in to review',
+    tournament: '[CBFC] New tournament registration — please log in to review',
   };
 
   return { subject: subjectMap[data.type], html };

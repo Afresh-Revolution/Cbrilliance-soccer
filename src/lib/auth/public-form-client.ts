@@ -27,3 +27,19 @@ export async function postPublicForm<T = unknown>(
   const data = await response.json();
   return { ok: response.ok, data, status: response.status };
 }
+
+export async function postPublicFormData<T = unknown>(
+  url: string,
+  body: FormData,
+): Promise<{ ok: boolean; data: T; status: number }> {
+  const csrfToken = await fetchCsrfToken();
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'x-csrf-token': csrfToken },
+    credentials: 'include',
+    body,
+  });
+
+  const data = await response.json();
+  return { ok: response.ok, data, status: response.status };
+}

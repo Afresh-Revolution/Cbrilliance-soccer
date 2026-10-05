@@ -1,4 +1,6 @@
+import { escapeHtml } from '@/lib/email/escape';
 import { sendEmailAsync } from '@/lib/email/send';
+import { renderEmailLayout, emailParagraph } from '@/lib/email/templates/layout';
 import { getAdminNotificationEmail } from '@/lib/email/config';
 import { renderAdminNotificationEmail } from '@/lib/email/templates/admin-notification';
 import {
@@ -179,6 +181,98 @@ interface ShopOrderSubmission {
     size: string;
     quantity: number;
   }[];
+}
+
+interface TournamentSubmission {
+  teamName: string;
+  officialName: string;
+  email?: string | null;
+  phone: string;
+  registrationCode: string;
+  squadUrl: string;
+  playerCount: number;
+  location: string;
+}
+
+export function notifyTournamentRegistration(data: TournamentSubmission): void {
+  if (data.email) {
+    const userEmail = renderSubmissionReceivedEmail({
+      type: 'tournament',
+      recipientName: data.officialName,
+      summaryRows: [
+        { label: 'Team', value: data.teamName },
+        { label: 'Registration ID', value: data.registrationCode },
+        { label: 'Squad size', value: String(data.playerCount) },
+      ],
+      ctaLabel: 'Add squad players',
+      ctaHref: data.squadUrl,
+    });
+
+    sendEmailAsync({
+      to: data.email,
+      subject: userEmail.subject,
+      html: userEmail.html,
+    });
+  }
+
+  const adminEmail = renderAdminNotificationEmail({
+    type: 'tournament',
+    detailRows: [
+      { label: 'Team', value: data.teamName },
+      { label: 'Registration ID', value: data.registrationCode },
+      { label: 'Official', value: data.officialName },
+      { label: 'Phone', value: data.phone },
+      ...(data.email ? [{ label: 'Email', value: data.email }] : []),
+      { label: 'Location', value: data.location },
+      { label: 'Squad size', value: String(data.playerCount) },
+    ],
+  });
+
+  sendEmailAsync({
+    to: getAdminNotificationEmail(),
+    subject: adminEmail.subject,
+    html: adminEmail.html,
+    replyTo: data.email || undefined,
+  });
+}
+
+const TOURNAMENT_STATUS_COPY: Record<string, { subject: string; message: string }> = {
+  under_review: {
+    subject: 'Tournament registration under review — CBrilliance',
+    message: 'The Tournament Committee is now reviewing your team registration.',
+  },
+  approved: {
+    subject: 'Tournament registration approved — CBrilliance',
+    message: 'The Tournament Committee has approved your team registration. Further instructions will follow through your registered phone number, WhatsApp, or email.',
+  },
+  rejected: {
+    subject: 'Tournament registration update — CBrilliance',
+    message: 'The Tournament Committee was unable to approve this registration based on the tournament requirements. Contact the committee if you need to discuss the decision.',
+  },
+};
+
+export function notifyTournamentStatusChange(
+  officialName: string,
+  email: string | undefined,
+  registrationCode: string,
+  nextStatus: string,
+): void {
+  if (!email) return;
+  const copy = TOURNAMENT_STATUS_COPY[nextStatus];
+  if (!copy) return;
+
+  const html = renderEmailLayout({
+    preheader: copy.subject,
+    title: 'Registration update',
+    bodyHtml: [
+      emailParagraph(`Hi ${escapeHtml(officialName)},`),
+      emailParagraph(copy.message),
+      emailParagraph(`Registration ID: ${escapeHtml(registrationCode)}`),
+    ].join(''),
+    footerNote: 'You received this email because your team registered for the CBrilliance Football Agency tournament.',
+  });
+
+  sendEmailAsync({ to: email, subject: copy.subject, html });
 }
 
 export function notifyShopOrder(data: ShopOrderSubmission): void {

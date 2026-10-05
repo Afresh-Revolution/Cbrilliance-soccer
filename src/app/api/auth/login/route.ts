@@ -69,7 +69,16 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Supabase API is not configured')) {
+      return NextResponse.json(
+        {
+          error: 'Admin login is not configured. Add your Supabase URL and publishable key to .env, then restart the app.',
+        },
+        { status: 503 },
+      );
+    }
+    console.error('[api/auth/login]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

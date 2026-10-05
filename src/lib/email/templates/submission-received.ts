@@ -6,7 +6,7 @@ import {
   renderEmailLayout,
 } from '@/lib/email/templates/layout';
 
-export type SubmissionType = 'contact' | 'academy' | 'scout';
+export type SubmissionType = 'contact' | 'academy' | 'scout' | 'tournament';
 
 const SUBMISSION_COPY: Record<
   SubmissionType,
@@ -30,12 +30,20 @@ const SUBMISSION_COPY: Record<
     intro: 'Thank you for your interest in CBFC talent. Your inquiry has been received by our agency team.',
     reviewNote: 'We\'ll review your message and follow up if there\'s a suitable match or opportunity to discuss further.',
   },
+  tournament: {
+    title: 'Registration submitted successfully',
+    preheader: 'Your CBrilliance Football Agency tournament registration has been received.',
+    intro: 'Your team registration has been received by the CBrilliance Football Agency Tournament Committee.',
+    reviewNote: 'Your registration will be reviewed by the Tournament Committee. You will receive confirmation and further instructions through your registered phone number, WhatsApp, or email. Use the button below to add players to your squad.',
+  },
 };
 
 export interface SubmissionReceivedEmailData {
   type: SubmissionType;
   recipientName: string;
   summaryRows?: { label: string; value: string }[];
+  ctaLabel?: string;
+  ctaHref?: string;
 }
 
 export function renderSubmissionReceivedEmail(data: SubmissionReceivedEmailData): {
@@ -79,8 +87,8 @@ export function renderSubmissionReceivedEmail(data: SubmissionReceivedEmailData)
     preheader: copy.preheader,
     title: copy.title,
     bodyHtml,
-    ctaLabel: 'Visit CBFC',
-    ctaHref: siteUrl,
+    ctaLabel: data.ctaLabel ?? 'Visit CBFC',
+    ctaHref: data.ctaHref ?? siteUrl,
     footerNote: 'You received this email because you submitted a form on cbrilliancefc.com.',
   });
 
@@ -88,6 +96,7 @@ export function renderSubmissionReceivedEmail(data: SubmissionReceivedEmailData)
     contact: 'We received your message — CBFC',
     academy: 'Academy application received — CBFC',
     scout: 'Scout inquiry received — CBFC Agency',
+    tournament: 'Tournament registration received — CBrilliance Football Agency',
   };
 
   return { subject: subjectMap[data.type], html };

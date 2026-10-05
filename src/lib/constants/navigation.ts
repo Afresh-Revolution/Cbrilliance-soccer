@@ -36,6 +36,20 @@ export const STATUS_LABELS: Record<string, string> = {
   in_camp: 'In Camp',
 };
 
+export const TOURNAMENT_STATUS_LABELS: Record<string, string> = {
+  submitted: 'Submitted',
+  under_review: 'Under review',
+  approved: 'Approved',
+  rejected: 'Rejected',
+};
+
+export const TOURNAMENT_POSITION_LABELS: Record<string, string> = {
+  team_manager: 'Team Manager',
+  coach: 'Coach',
+  team_representative: 'Team Representative',
+  club_official: 'Club Official',
+};
+
 export const APPLICATION_STATUS_LABELS: Record<string, string> = {
   new: 'New',
   reviewed: 'Reviewed',
